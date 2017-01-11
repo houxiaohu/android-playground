@@ -51,7 +51,9 @@ public class MainActivity extends AppCompatActivity {
 //        toolbar.setNavigationOnClickListener(view -> onBackPressed());
         ((SampleItemAdapter) sampleRecyclerView.getAdapter()).setOnClickListener(
                 (view, viewHolder, position, itemModel) -> {
-                    startActivity(new Intent(MainActivity.this, itemModel.getClazz()));
+                    Intent intent = new Intent(MainActivity.this, SampleActivity.class);
+                    intent.putExtra(SampleActivity.KEY_INDEX, position);
+                    startActivity(intent);
                 });
     }
 

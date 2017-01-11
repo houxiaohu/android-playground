@@ -63,5 +63,7 @@ dependencies {
     compile 'com.mikepenz:google-material-typeface:2.2.0.3.original@aar'
     compile 'com.mikepenz:fontawesome-typeface:4.7.0.0@aar'
 
+    compile 'com.caverock:androidsvg:1.2.1'
+
     compile 'com.orhanobut:logger:1.15'
 }
