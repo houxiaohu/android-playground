@@ -8,10 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.xudshen.android.playground.R;
+import info.xudshen.android.playground.model.SampleItemModel;
 import info.xudshen.android.playground.view.adapter.SampleItemAdapter;
 
 /**
@@ -49,12 +51,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void initEvents() {
 //        toolbar.setNavigationOnClickListener(view -> onBackPressed());
-        ((SampleItemAdapter) sampleRecyclerView.getAdapter()).setOnClickListener(
-                (view, viewHolder, position, itemModel) -> {
-                    Intent intent = new Intent(MainActivity.this, SampleActivity.class);
-                    intent.putExtra(SampleActivity.KEY_INDEX, position);
-                    startActivity(intent);
-                });
+        ((SampleItemAdapter) sampleRecyclerView.getAdapter()).setOnClickListener(new SampleItemAdapter.OnClickListener() {
+            @Override
+            public void onClick(View view, SampleItemAdapter.ViewHolder viewHolder, int position, SampleItemModel itemModel) {
+                Intent intent = new Intent(MainActivity.this, SampleActivity.class);
+                intent.putExtra(SampleActivity.KEY_INDEX, position);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

@@ -13,9 +13,6 @@ android {
         versionName "1.0"
 
         multiDexEnabled true
-        jackOptions {
-            enabled true
-        }
 
         vectorDrawables.useSupportLibrary = true
     }

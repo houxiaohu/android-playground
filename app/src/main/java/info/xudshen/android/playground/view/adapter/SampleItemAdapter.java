@@ -51,10 +51,13 @@ public class SampleItemAdapter extends RecyclerView.Adapter<SampleItemAdapter.Vi
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            itemView.setOnClickListener(view -> {
-                if (onClickListener != null) {
-                    onClickListener.onClick(view, ViewHolder.this, getAdapterPosition(),
-                            SampleItemDataSource.DATA.get(getAdapterPosition()));
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (onClickListener != null) {
+                        onClickListener.onClick(view, ViewHolder.this, getAdapterPosition(),
+                                SampleItemDataSource.DATA.get(getAdapterPosition()));
+                    }
                 }
             });
         }
