@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 25
@@ -61,6 +62,8 @@ dependencies {
     compile "com.mikepenz:iconics-core:2.8.2@aar"
     compile 'com.mikepenz:google-material-typeface:2.2.0.3.original@aar'
     compile 'com.mikepenz:fontawesome-typeface:4.7.0.0@aar'
+
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 
     compile 'com.caverock:androidsvg:1.2.1'
 
