@@ -32,7 +32,8 @@ class SvgSampleFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        animImageView?.setBackgroundResource(R.drawable.clock_animate)
+        animImageView?.setBackgroundResource(R.drawable.path_morph_animate)
+//        animImageView?.setBackgroundResource(R.drawable.clock_animate)
 //        animImageView?.background =  PathTracingDrawable(context, R.raw.helloworld)
     }
 
