@@ -7,9 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-
 import info.xudshen.android.playground.R
-import info.xudshen.android.playground.animation.svg.PathTracingDrawable
 
 /**
  * Created by xudong on 2017/1/11.
@@ -34,7 +32,8 @@ class SvgSampleFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        animImageView?.background = PathTracingDrawable(context, R.raw.helloworld)
+        animImageView?.setBackgroundResource(R.drawable.clock_animate)
+//        animImageView?.background =  PathTracingDrawable(context, R.raw.helloworld)
     }
 
     override fun onDestroyView() {

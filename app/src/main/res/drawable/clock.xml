@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportHeight="1000"
+    android:viewportWidth="1000">
+    <!--背景-->
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M0,500
+    A500,500 0 0 1 1000,500
+    A500,500 0 0 1 0,500
+    Z" />
+    <path
+        android:fillColor="#20B7AF"
+        android:pathData="M50,500
+    A450,450 0 0 1 950,500
+    A450,450 0 0 1 50,500
+    Z" />
+
+    <!--刻度-->
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="0">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="30">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="60">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="90">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="120">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="150">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="180">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="210">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="240">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="270">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="300">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <group
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="330">
+        <path
+            android:pathData="M500,60 l0,60Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <!--针-->
+    <group
+        android:name="hourHand"
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="120">
+        <path
+            android:pathData="M500,490 l0,-300Z"
+            android:strokeColor="#fffbf9"
+            android:strokeWidth="20" />
+    </group>
+    <group
+        android:name="minuteHand"
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="0">
+        <path
+            android:pathData="M500,490 l0,-380Z"
+            android:strokeColor="#fdfdfd"
+            android:strokeWidth="20" />
+    </group>
+    <group
+        android:name="secondHand"
+        android:pivotX="500"
+        android:pivotY="500"
+        android:rotation="0">
+        <path
+            android:pathData="M500,490 l0,-400Z"
+            android:strokeColor="#C1EFED"
+            android:strokeWidth="10" />
+    </group>
+    <!--轴-->
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M480,500
+    A20,20 0 0 1 520,500
+    A20,20 0 0 1 480,500
+    Z" />
+    <path
+        android:fillColor="#20B7AF"
+        android:pathData="M490,500
+    A10,10 0 0 1 510,500
+    A10,10 0 0 1 490,500
+    Z" />
+
+</vector>

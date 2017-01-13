@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/clock">
+    <target
+        android:name="secondHand"
+        android:animation="@anim/clock_rotation_second" />
+    <target
+        android:name="minuteHand"
+        android:animation="@anim/clock_rotation_minute" />
+    <target
+        android:name="hourHand"
+        android:animation="@anim/clock_rotation_hour" />
+</animated-vector>
