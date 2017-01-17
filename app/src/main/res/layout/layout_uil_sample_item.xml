@@ -5,20 +5,9 @@
     android:orientation="horizontal">
 
     <info.xudshen.android.playground.view.widget.SmartImageView
-        android:id="@+id/uil_iv_left"
-        android:layout_width="0dp"
+        android:id="@+id/uil_iv"
+        android:layout_width="match_parent"
         android:layout_height="120dp"
         android:layout_margin="5dp"
-        android:layout_weight="1"
-        android:background="@color/md_amber_500"
-        android:scaleType="centerCrop" />
-
-    <info.xudshen.android.playground.view.widget.SmartImageView
-        android:id="@+id/uil_iv_right"
-        android:layout_width="0dp"
-        android:layout_height="120dp"
-        android:layout_margin="5dp"
-        android:layout_weight="1"
-        android:background="@color/md_cyan_500"
         android:scaleType="centerCrop" />
 </LinearLayout>
