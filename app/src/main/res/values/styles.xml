@@ -13,4 +13,19 @@
         <item name="android:textColorHint">@color/colorTextHint</item>
     </style>
 
+    <style name="TextAppearance.AppCompat.Cap"></style>
+
+    <style name="Divider">
+        <item name="android:background">@color/colorDivider</item>
+    </style>
+
+    <style name="Divider.H">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1px</item>
+    </style>
+
+    <style name="Divider.V">
+        <item name="android:layout_width">1px</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
 </resources>
