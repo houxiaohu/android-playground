@@ -20,8 +20,10 @@
         app:rowCount="3">
 
         <ImageView
+            android:id="@+id/section_cover"
             android:layout_width="match_parent"
-            android:layout_height="200dp" />
+            android:layout_height="200dp"
+            android:scaleType="centerCrop" />
 
         <View
             android:layout_width="match_parent"
@@ -30,10 +32,10 @@
 
         <TextView
             android:id="@+id/section_title"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:textSize="16sp"
             tools:text="this is a text" />
     </android.support.v7.widget.GridLayout>
 

@@ -4,11 +4,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-
+import com.nostra13.universalimageloader.core.ImageLoader
 import info.xudshen.android.playground.R
 import info.xudshen.android.playground.data.SampleItemDataSource
 import info.xudshen.android.playground.model.SampleItemModel
+import kotlinx.android.synthetic.main.layout_sample_item.view.*
 
 /**
  * Created by xudong on 2017/1/11.
@@ -22,7 +22,8 @@ class SampleItemAdapter : RecyclerView.Adapter<SampleItemAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val itemModel = SampleItemDataSource.DATA[position]
-        holder.title.text = itemModel.title
+        holder.itemView.section_title.text = itemModel.title
+        ImageLoader.getInstance().displayImage("drawable://${itemModel.cover}", holder.itemView.section_cover)
     }
 
     override fun getItemCount(): Int = SampleItemDataSource.DATA.size
@@ -30,8 +31,6 @@ class SampleItemAdapter : RecyclerView.Adapter<SampleItemAdapter.ViewHolder>() {
     override fun getItemViewType(position: Int): Int = R.layout.layout_sample_item
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal var title: TextView = itemView.findViewById(R.id.section_title) as TextView
-
         init {
             itemView.setOnClickListener {
                 onClickListener?.invoke(it, this@ViewHolder, adapterPosition,
