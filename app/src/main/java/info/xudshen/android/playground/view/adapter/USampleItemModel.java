@@ -30,7 +30,7 @@ public class USampleItemModel extends UUniversalAdapter.AbstractModel<USampleIte
     }
 
     @Override
-    public void bindData(ViewHolder holder) {
+    public void bindData(@NonNull ViewHolder holder) {
         //do something
         holder.title.setText(data.getTitle());
     }

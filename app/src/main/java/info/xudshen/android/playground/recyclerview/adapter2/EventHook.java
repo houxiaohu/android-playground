@@ -13,6 +13,13 @@ import java.util.List;
  */
 
 public abstract class EventHook<VH extends RecyclerView.ViewHolder> {
+    @NonNull
+    final Class<VH> clazz;
+
+    public EventHook(@NonNull Class<VH> clazz) {
+        this.clazz = clazz;
+    }
+
     public abstract void onEvent(@NonNull View view, @NonNull VH viewHolder,
                                  @NonNull UUniversalAdapter adapter);
 

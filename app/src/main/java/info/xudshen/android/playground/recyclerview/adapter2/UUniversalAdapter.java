@@ -29,7 +29,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private EventHookHelper eventHookHelper = new EventHookHelper(this);
 
     public UUniversalAdapter() {
-        eventHookHelper.add(onItemClickEventHook);
+        addOnItemClickEventHook();
     }
 
     //<editor-fold desc="CRUD Method">
@@ -62,7 +62,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyItemRangeInserted(initialSize, modelsToAdd.size());
     }
 
-    protected void insertModelBefore(AbstractModel<?> modelToInsert, AbstractModel<?> modelToInsertBefore) {
+    public void insertModelBefore(AbstractModel<?> modelToInsert, AbstractModel<?> modelToInsertBefore) {
         int targetIndex = models.indexOf(modelToInsertBefore);
         if (targetIndex == -1) return;
 
@@ -70,7 +70,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyItemInserted(targetIndex);
     }
 
-    protected void insertModelAfter(AbstractModel<?> modelToInsert, AbstractModel<?> modelToInsertAfter) {
+    public void insertModelAfter(AbstractModel<?> modelToInsert, AbstractModel<?> modelToInsertAfter) {
         int modelIndex = models.indexOf(modelToInsertAfter);
         if (modelIndex == -1) return;
 
@@ -80,11 +80,11 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyItemInserted(targetIndex);
     }
 
-    protected void notifyModelChanged(AbstractModel<?> model) {
+    public void notifyModelChanged(AbstractModel<?> model) {
         notifyModelChanged(model, null);
     }
 
-    protected void notifyModelChanged(AbstractModel<?> model, @Nullable Object payload) {
+    public void notifyModelChanged(AbstractModel<?> model, @Nullable Object payload) {
         int index = models.indexOf(model);
         if (index != -1) {
             notifyItemChanged(index, payload);
@@ -197,7 +197,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     //</editor-fold>
 
     //<editor-fold desc="Model">
-    private class ViewHolderFactory {
+    private static class ViewHolderFactory {
         private SparseArray<IViewHolderCreator<?>> creatorSparseArray = new SparseArray<>();
 
         void register(AbstractModel<?> model) {
@@ -223,7 +223,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-    private class ModelList extends ArrayList<AbstractModel<?>> {
+    private static class ModelList extends ArrayList<AbstractModel<?>> {
         private ViewHolderFactory viewHolderFactory = new ViewHolderFactory();
 
         @Override
@@ -256,60 +256,71 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         @LayoutRes
         public abstract int getLayoutRes();
 
-        public void bindData(T holder) {
+        public void bindData(@NonNull T holder) {
         }
 
-        public void bindData(T holder, List<Object> payloads) {
+        public void bindData(@NonNull T holder, @Nullable List<Object> payloads) {
             bindData(holder);
         }
 
         public abstract IViewHolderCreator<T> getViewHolderCreator();
 
         @Override
-        public boolean isItemTheSame(AbstractModel<?> item) {
+        public boolean isItemTheSame(@NonNull AbstractModel<?> item) {
             return this == item;
         }
 
         @Override
-        public boolean isContentTheSame(AbstractModel<?> item) {
+        public boolean isContentTheSame(@NonNull AbstractModel<?> item) {
             return this == item;
         }
     }
 
-    public interface IViewHolderCreator<T extends RecyclerView.ViewHolder> {
-        T create(View view);
+    public interface IViewHolderCreator<VH extends RecyclerView.ViewHolder> {
+        VH create(@NonNull View view);
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Event Hook">
+    public <VH extends RecyclerView.ViewHolder> void addEventHook(EventHook<VH> eventHook) {
+        // noinspection unchecked
+        eventHookHelper.add(eventHook);
     }
     //</editor-fold>
 
     //<editor-fold desc="OnClickListener">
     private OnItemClickListener onItemClickListener;
-    private EventHook<RecyclerView.ViewHolder> onItemClickEventHook = new EventHook<
-            RecyclerView.ViewHolder>() {
-        @Override
-        public void onEvent(@NonNull View view, @NonNull final RecyclerView.ViewHolder viewHolder,
-                            @NonNull final UUniversalAdapter adapter) {
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (onItemClickListener != null) {
-                        int position = viewHolder.getAdapterPosition();
-                        if (position != NO_POSITION) {
-                            onItemClickListener.onClick(v, position, adapter.getModel(position));
-                        }
-                    }
-                }
-            });
-        }
-
-        @Nullable
-        @Override
-        public View onBind(@NonNull RecyclerView.ViewHolder viewHolder) {
-            return viewHolder.itemView;
-        }
-    };
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+
+    private void addOnItemClickEventHook() {
+        EventHook<RecyclerView.ViewHolder> onItemClickEventHook = new EventHook<
+                RecyclerView.ViewHolder>(RecyclerView.ViewHolder.class) {
+            @Override
+            public void onEvent(@NonNull View view, @NonNull final RecyclerView.ViewHolder viewHolder,
+                                @NonNull final UUniversalAdapter adapter) {
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (onItemClickListener != null) {
+                            int position = viewHolder.getAdapterPosition();
+                            if (position != NO_POSITION) {
+                                onItemClickListener.onClick(v, position, adapter.getModel(position));
+                            }
+                        }
+                    }
+                });
+            }
+
+            @Nullable
+            @Override
+            public View onBind(@NonNull RecyclerView.ViewHolder viewHolder) {
+                return viewHolder.itemView;
+            }
+        };
+        addEventHook(onItemClickEventHook);
     }
 
     public interface OnItemClickListener {

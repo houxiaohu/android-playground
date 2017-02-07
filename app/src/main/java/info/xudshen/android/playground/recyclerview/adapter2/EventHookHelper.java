@@ -13,30 +13,38 @@ import java.util.List;
  * @since 2017/2/6
  */
 
-class EventHookHelper {
+class EventHookHelper<VH extends RecyclerView.ViewHolder> {
+    private boolean isAfterBind = false;
+
     @NonNull
     private final UUniversalAdapter uUniversalAdapter;
-    private final List<EventHook<RecyclerView.ViewHolder>> eventHooks = new ArrayList<>();
+    private final List<EventHook<VH>> eventHooks = new ArrayList<>();
 
     EventHookHelper(@NonNull UUniversalAdapter uUniversalAdapter) {
         this.uUniversalAdapter = uUniversalAdapter;
     }
 
-    void add(@NonNull EventHook<RecyclerView.ViewHolder> eventHook) {
+    void add(@NonNull EventHook<VH> eventHook) {
+        if (isAfterBind) {
+            throw new RuntimeException("can not add event hook after bind");
+        }
         eventHooks.add(eventHook);
     }
 
     void bind(@NonNull RecyclerView.ViewHolder viewHolder) {
-        for (final EventHook<RecyclerView.ViewHolder> eventHook : eventHooks) {
-            View view = eventHook.onBind(viewHolder);
+        for (final EventHook<VH> eventHook : eventHooks) {
+            if (!eventHook.clazz.isInstance(viewHolder)) continue;
+            final VH vh = eventHook.clazz.cast(viewHolder);
+
+            View view = eventHook.onBind(vh);
             if (view != null) {
-                attachToView(eventHook, viewHolder, view);
+                attachToView(eventHook, vh, view);
             }
 
-            List<? extends View> views = eventHook.onBindMany(viewHolder);
+            List<? extends View> views = eventHook.onBindMany(vh);
             if (views != null) {
                 for (View v : views) {
-                    attachToView(eventHook, viewHolder, v);
+                    attachToView(eventHook, vh, v);
                 }
             }
         }
@@ -45,9 +53,12 @@ class EventHookHelper {
     /**
      * bind {@param eventHook} to {@param view}
      */
-    void attachToView(@NonNull EventHook<RecyclerView.ViewHolder> eventHook,
-                      @NonNull RecyclerView.ViewHolder viewHolder, @Nullable View view) {
+    private void attachToView(@NonNull EventHook<VH> eventHook, @NonNull VH viewHolder,
+                              @Nullable View view) {
         if (view == null) return;
         eventHook.onEvent(view, viewHolder, uUniversalAdapter);
+
+        //set true once having one success bind
+        isAfterBind = true;
     }
 }

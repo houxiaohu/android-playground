@@ -6,9 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import info.xudshen.android.playground.R
-import info.xudshen.android.playground.data.SampleItemDataSource
-import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter
-import info.xudshen.android.playground.view.adapter.USampleItemModel
+import info.xudshen.android.playground.view.adapter.SampleItemAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -32,15 +30,12 @@ class MainActivity : AppCompatActivity() {
 
         sample_list.layoutManager = LinearLayoutManager(this)
         sample_list.itemAnimator = DefaultItemAnimator()
-        sample_list.adapter = UUniversalAdapter()
+        sample_list.adapter = SampleItemAdapter()
     }
 
     private fun initEvents() {
 //        toolbar?.setNavigationOnClickListener { onBackPressed() }
-        SampleItemDataSource.DATA.map {
-            (sample_list.adapter as UUniversalAdapter).addModel(USampleItemModel(it))
-        }
-        (sample_list.adapter as UUniversalAdapter).setOnItemClickListener { view, pos, model ->
+        (sample_list.adapter as SampleItemAdapter).onClickListener = { view, vh, pos, model ->
             val intent = Intent(this@MainActivity, SampleActivity::class.java)
             intent.putExtra(SampleActivity.KEY_INDEX, pos)
             startActivity(intent)
