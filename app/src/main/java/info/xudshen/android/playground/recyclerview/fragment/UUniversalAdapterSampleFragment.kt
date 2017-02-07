@@ -44,7 +44,10 @@ class UUniversalAdapterSampleFragment : Fragment() {
         (activity as AppCompatActivity?)?.setSupportActionBar(toolbar)
         (activity as AppCompatActivity?)?.title = "UUniversalAdapter"
 
-        list.layoutManager = GridLayoutManager(context, 1)
+        adapter.setSpanCount(4)
+        list.layoutManager = GridLayoutManager(context, 4)
+        (list.layoutManager as GridLayoutManager).spanSizeLookup = adapter.spanSizeLookup
+
         list.adapter = adapter
 
         adapter.setOnItemClickListener { view, pos, absModel ->
@@ -122,6 +125,8 @@ class UUniversalAdapterSampleFragment : Fragment() {
         override fun bindData(holder: ViewHolder) {
             holder.itemView.section_title.text = title
         }
+
+        override fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int = 2
 
         class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     }

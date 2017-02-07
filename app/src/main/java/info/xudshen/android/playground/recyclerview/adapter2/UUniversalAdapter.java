@@ -4,6 +4,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -26,10 +27,32 @@ import static android.view.View.NO_ID;
 
 public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final ModelList models = new ModelList();
+    //<editor-fold desc="GridLayout support">
+    private final GridLayoutManager.SpanSizeLookup spanSizeLookup = new GridLayoutManager
+            .SpanSizeLookup() {
+        @Override
+        public int getSpanSize(int position) {
+            AbstractModel<?> model = getModel(position);
+            return model != null ? model.getSpanSize(spanCount, position, getItemCount()) : 1;
+        }
+    };
+
+    private int spanCount = 1;
+
+    public GridLayoutManager.SpanSizeLookup getSpanSizeLookup() {
+        return spanSizeLookup;
+    }
+
+    public void setSpanCount(int spanCount) {
+        this.spanCount = spanCount;
+    }
+    //</editor-fold>
+
     private EventHookHelper eventHookHelper = new EventHookHelper(this);
 
     public UUniversalAdapter() {
         setHasStableIds(true);
+        spanSizeLookup.setSpanIndexCacheEnabled(true);
 
         addOnItemClickEventHook();
     }
@@ -269,7 +292,8 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     /**
      * every model should have its own identity, defaultValue {@link #id}
-     * otherwise may cause the {@link DiffUtil#calculateDiff(DiffUtil.Callback)} failed
+     * otherwise may cause the {@link DiffUtil#calculateDiff(DiffUtil.Callback)} failed,
+     * even "Inconsistency detected" exception
      */
     public static abstract class AbstractModel<T extends RecyclerView.ViewHolder>
             implements IDiffUtilHelper<AbstractModel<?>> {
@@ -286,6 +310,10 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         public long id() {
             return id;
+        }
+
+        public int getSpanSize(int totalSpanCount, int position, int itemCount) {
+            return 1;
         }
 
         @LayoutRes
