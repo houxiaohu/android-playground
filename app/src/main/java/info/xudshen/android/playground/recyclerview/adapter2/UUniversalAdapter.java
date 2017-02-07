@@ -29,6 +29,8 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private EventHookHelper eventHookHelper = new EventHookHelper(this);
 
     public UUniversalAdapter() {
+        setHasStableIds(true);
+
         addOnItemClickEventHook();
     }
 
@@ -38,10 +40,17 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return position >= 0 && position < models.size() ? models.get(position) : null;
     }
 
-    protected List<AbstractModel<?>> getAllModelsAfter(AbstractModel<?> model) {
+    protected List<AbstractModel<?>> getAllModelSubListAfter(AbstractModel<?> model) {
         int index = models.indexOf(model);
         if (index == -1) return Collections.emptyList();
         return models.subList(index + 1, models.size());
+    }
+
+    public List<AbstractModel<?>> getAllModelListAfter(AbstractModel<?> model) {
+        int index = models.indexOf(model);
+        if (index == -1) return Collections.emptyList();
+
+        return new ArrayList<>(models.subList(index + 1, models.size()));
     }
 
     public void addModel(AbstractModel<?> modelToAdd) {
@@ -110,7 +119,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void removeAllAfterModel(AbstractModel<?> model) {
         final int initialSize = models.size();
 
-        List<AbstractModel<?>> modelsToRemove = getAllModelsAfter(model);
+        List<AbstractModel<?>> modelsToRemove = getAllModelSubListAfter(model);
         int numModelsRemoved = modelsToRemove.size();
         if (numModelsRemoved == 0) return;
 
@@ -194,6 +203,13 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         AbstractModel model = getModel(position);
         return model == null ? NO_ID : model.getLayoutRes();
     }
+
+    @Override
+    public long getItemId(int position) {
+        AbstractModel model = getModel(position);
+        return model == null ? NO_ID : model.id();
+    }
+
     //</editor-fold>
 
     //<editor-fold desc="Model">
@@ -251,8 +267,27 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
+    /**
+     * every model should have its own identity, defaultValue {@link #id}
+     * otherwise may cause the {@link DiffUtil#calculateDiff(DiffUtil.Callback)} failed
+     */
     public static abstract class AbstractModel<T extends RecyclerView.ViewHolder>
             implements IDiffUtilHelper<AbstractModel<?>> {
+        private static long idCounter = -1;
+        private long id;
+
+        protected AbstractModel(long id) {
+            this.id = id;
+        }
+
+        public AbstractModel() {
+            this(idCounter--);
+        }
+
+        public long id() {
+            return id;
+        }
+
         @LayoutRes
         public abstract int getLayoutRes();
 
@@ -267,12 +302,12 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         @Override
         public boolean isItemTheSame(@NonNull AbstractModel<?> item) {
-            return this == item;
+            return id == item.id;
         }
 
         @Override
         public boolean isContentTheSame(@NonNull AbstractModel<?> item) {
-            return this == item;
+            return true;
         }
     }
 
