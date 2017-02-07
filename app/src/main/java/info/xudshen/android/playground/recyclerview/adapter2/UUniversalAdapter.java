@@ -3,6 +3,7 @@ package info.xudshen.android.playground.recyclerview.adapter2;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,38 +25,141 @@ import static android.view.View.NO_ID;
  */
 
 public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final List<AbstractModel<?>> models = new ArrayList<>();
-    private SparseArray<IViewHolderCreator<?>> creatorSparseArray = new SparseArray<>();
+    private final ModelList models = new ModelList();
     private EventHookHelper eventHookHelper = new EventHookHelper(this);
 
     public UUniversalAdapter() {
         eventHookHelper.add(onItemClickEventHook);
     }
 
-    //<editor-fold desc="CURD Method">
+    //<editor-fold desc="CRUD Method">
     @Nullable
     public AbstractModel<?> getModel(int position) {
         return position >= 0 && position < models.size() ? models.get(position) : null;
     }
 
-    public void add(AbstractModel<?> model) {
-        models.add(model);
-        if (creatorSparseArray.get(model.getLayoutRes()) == null) {
-            creatorSparseArray.put(model.getLayoutRes(), model.getViewHolderCreator());
+    protected List<AbstractModel<?>> getAllModelsAfter(AbstractModel<?> model) {
+        int index = models.indexOf(model);
+        if (index == -1) return Collections.emptyList();
+        return models.subList(index + 1, models.size());
+    }
+
+    public void addModel(AbstractModel<?> modelToAdd) {
+        final int initialSize = models.size();
+
+        models.add(modelToAdd);
+        notifyItemInserted(initialSize);
+    }
+
+    public void addModels(AbstractModel<?>... modelsToAdd) {
+        addModels(Arrays.asList(modelsToAdd));
+    }
+
+    public void addModels(Collection<? extends AbstractModel<?>> modelsToAdd) {
+        final int initialSize = models.size();
+
+        models.addAll(modelsToAdd);
+        notifyItemRangeInserted(initialSize, modelsToAdd.size());
+    }
+
+    protected void insertModelBefore(AbstractModel<?> modelToInsert, AbstractModel<?> modelToInsertBefore) {
+        int targetIndex = models.indexOf(modelToInsertBefore);
+        if (targetIndex == -1) return;
+
+        models.add(targetIndex, modelToInsert);
+        notifyItemInserted(targetIndex);
+    }
+
+    protected void insertModelAfter(AbstractModel<?> modelToInsert, AbstractModel<?> modelToInsertAfter) {
+        int modelIndex = models.indexOf(modelToInsertAfter);
+        if (modelIndex == -1) return;
+
+        int targetIndex = modelIndex + 1;
+
+        models.add(targetIndex, modelToInsert);
+        notifyItemInserted(targetIndex);
+    }
+
+    protected void notifyModelChanged(AbstractModel<?> model) {
+        notifyModelChanged(model, null);
+    }
+
+    protected void notifyModelChanged(AbstractModel<?> model, @Nullable Object payload) {
+        int index = models.indexOf(model);
+        if (index != -1) {
+            notifyItemChanged(index, payload);
         }
-        notifyItemInserted(models.size());
+    }
+
+    public void removeModel(AbstractModel<?> modelToRemove) {
+        int index = models.indexOf(modelToRemove);
+        if (index >= 0 && index < models.size()) {
+            models.remove(index);
+
+            notifyItemRemoved(index);
+        }
+    }
+
+    public void removeAllModels() {
+        final int initialSize = models.size();
+
+        models.clear();
+        notifyItemRangeRemoved(0, initialSize);
+    }
+
+    public void removeAllAfterModel(AbstractModel<?> model) {
+        final int initialSize = models.size();
+
+        List<AbstractModel<?>> modelsToRemove = getAllModelsAfter(model);
+        int numModelsRemoved = modelsToRemove.size();
+        if (numModelsRemoved == 0) return;
+
+        //clear the sublist
+        modelsToRemove.clear();
+        notifyItemRangeRemoved(initialSize - numModelsRemoved, numModelsRemoved);
+    }
+
+    public void replaceAllModels(@NonNull final List<? extends AbstractModel<?>> modelsToReplace) {
+        if (models.size() == 0) {
+            addModels(modelsToReplace);
+        } else {
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return models.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return modelsToReplace.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    AbstractModel<?> oldModel = CollectionsHelper.getOrNull(models, oldItemPosition),
+                            newModel = CollectionsHelper.getOrNull(modelsToReplace, newItemPosition);
+                    return oldModel != null && newModel != null && oldModel.isItemTheSame(newModel);
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    AbstractModel<?> oldModel = CollectionsHelper.getOrNull(models, oldItemPosition),
+                            newModel = CollectionsHelper.getOrNull(modelsToReplace, newItemPosition);
+                    return oldModel != null && newModel != null && oldModel.isContentTheSame(newModel);
+                }
+            });
+            models.clear();
+            models.addAll(modelsToReplace);
+            result.dispatchUpdatesTo(this);
+        }
     }
     //</editor-fold>
 
+    //<editor-fold desc="Core">
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        IViewHolderCreator viewHolderCreator = creatorSparseArray.get(viewType);
-        if (viewHolderCreator == null) {
-            throw new RuntimeException("cannot find viewHolderCreator for viewType=" + viewType);
-        }
-
-        RecyclerView.ViewHolder viewHolder = viewHolderCreator.create(LayoutInflater.
-                from(parent.getContext()).inflate(viewType, parent, false));
+        RecyclerView.ViewHolder viewHolder = models.viewHolderFactory.create(viewType,
+                LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false));
 
         eventHookHelper.bind(viewHolder);
         return viewHolder;
@@ -88,9 +194,65 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         AbstractModel model = getModel(position);
         return model == null ? NO_ID : model.getLayoutRes();
     }
+    //</editor-fold>
 
     //<editor-fold desc="Model">
-    public static abstract class AbstractModel<T extends RecyclerView.ViewHolder> {
+    private class ViewHolderFactory {
+        private SparseArray<IViewHolderCreator<?>> creatorSparseArray = new SparseArray<>();
+
+        void register(AbstractModel<?> model) {
+            if (creatorSparseArray.get(model.getLayoutRes()) == null) {
+                creatorSparseArray.put(model.getLayoutRes(), model.getViewHolderCreator());
+            }
+        }
+
+        void register(Collection<? extends AbstractModel<?>> models) {
+            for (final AbstractModel model : models) {
+                if (creatorSparseArray.get(model.getLayoutRes()) == null) {
+                    creatorSparseArray.put(model.getLayoutRes(), model.getViewHolderCreator());
+                }
+            }
+        }
+
+        RecyclerView.ViewHolder create(@LayoutRes int viewType, @NonNull View view) {
+            IViewHolderCreator<?> viewHolderCreator = creatorSparseArray.get(viewType);
+            if (viewHolderCreator == null) {
+                throw new RuntimeException("cannot find viewHolderCreator for viewType=" + viewType);
+            }
+            return viewHolderCreator.create(view);
+        }
+    }
+
+    private class ModelList extends ArrayList<AbstractModel<?>> {
+        private ViewHolderFactory viewHolderFactory = new ViewHolderFactory();
+
+        @Override
+        public boolean add(AbstractModel<?> model) {
+            viewHolderFactory.register(model);
+            return super.add(model);
+        }
+
+        @Override
+        public void add(int index, AbstractModel<?> element) {
+            viewHolderFactory.register(element);
+            super.add(index, element);
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends AbstractModel<?>> c) {
+            viewHolderFactory.register(c);
+            return super.addAll(c);
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends AbstractModel<?>> c) {
+            viewHolderFactory.register(c);
+            return super.addAll(index, c);
+        }
+    }
+
+    public static abstract class AbstractModel<T extends RecyclerView.ViewHolder>
+            implements IDiffUtilHelper<AbstractModel<?>> {
         @LayoutRes
         public abstract int getLayoutRes();
 
@@ -102,6 +264,16 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         public abstract IViewHolderCreator<T> getViewHolderCreator();
+
+        @Override
+        public boolean isItemTheSame(AbstractModel<?> item) {
+            return this == item;
+        }
+
+        @Override
+        public boolean isContentTheSame(AbstractModel<?> item) {
+            return this == item;
+        }
     }
 
     public interface IViewHolderCreator<T extends RecyclerView.ViewHolder> {

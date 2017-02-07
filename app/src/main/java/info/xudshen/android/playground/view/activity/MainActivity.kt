@@ -3,6 +3,7 @@ package info.xudshen.android.playground.view.activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import info.xudshen.android.playground.R
 import info.xudshen.android.playground.data.SampleItemDataSource
@@ -30,13 +31,14 @@ class MainActivity : AppCompatActivity() {
         collapsing_toolbar.title = "Playground"
 
         sample_list.layoutManager = LinearLayoutManager(this)
+        sample_list.itemAnimator = DefaultItemAnimator()
         sample_list.adapter = UUniversalAdapter()
     }
 
     private fun initEvents() {
 //        toolbar?.setNavigationOnClickListener { onBackPressed() }
         SampleItemDataSource.DATA.map {
-            (sample_list.adapter as UUniversalAdapter).add(USampleItemModel(it))
+            (sample_list.adapter as UUniversalAdapter).addModel(USampleItemModel(it))
         }
         (sample_list.adapter as UUniversalAdapter).setOnItemClickListener { view, pos, model ->
             val intent = Intent(this@MainActivity, SampleActivity::class.java)
