@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static android.support.v7.widget.RecyclerView.NO_POSITION;
 import static android.view.View.NO_ID;
 
 /**
@@ -359,22 +358,14 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void addOnItemClickEventHook() {
-        EventHook<RecyclerView.ViewHolder> onItemClickEventHook = new EventHook<
+        EventHook<RecyclerView.ViewHolder> onItemClickEventHook = new OnClickEventHook<
                 RecyclerView.ViewHolder>(RecyclerView.ViewHolder.class) {
             @Override
-            public void onEvent(@NonNull View view, @NonNull final RecyclerView.ViewHolder viewHolder,
-                                @NonNull final UUniversalAdapter adapter) {
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (onItemClickListener != null) {
-                            int position = viewHolder.getAdapterPosition();
-                            if (position != NO_POSITION) {
-                                onItemClickListener.onClick(v, position, adapter.getModel(position));
-                            }
-                        }
-                    }
-                });
+            public void onClick(@NonNull View view, @NonNull RecyclerView.ViewHolder viewHolder,
+                                int position, @NonNull AbstractModel rawModel) {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onClick(view, viewHolder, position, rawModel);
+                }
             }
 
             @Nullable
@@ -387,7 +378,8 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public interface OnItemClickListener {
-        void onClick(View itemView, int position, AbstractModel<?> model);
+        void onClick(@NonNull View itemView, @NonNull RecyclerView.ViewHolder viewHolder,
+                     int position, @NonNull AbstractModel<?> model);
     }
     //</editor-fold>
 }

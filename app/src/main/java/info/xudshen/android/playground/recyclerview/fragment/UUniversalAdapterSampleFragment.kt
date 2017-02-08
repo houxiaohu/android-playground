@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import info.xudshen.android.playground.R
-import info.xudshen.android.playground.recyclerview.adapter2.EventHook
+import info.xudshen.android.playground.recyclerview.adapter2.OnClickEventHook
 import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter
 import kotlinx.android.synthetic.main.fragment_uuniversal_adapter_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -50,7 +50,7 @@ class UUniversalAdapterSampleFragment : Fragment() {
 
         list.adapter = adapter
 
-        adapter.setOnItemClickListener { view, pos, absModel ->
+        adapter.setOnItemClickListener { view, vh, pos, absModel ->
             when (absModel) {
                 is ButtonModel -> {
 
@@ -64,42 +64,39 @@ class UUniversalAdapterSampleFragment : Fragment() {
 
         var insertId = 10000
 
-        adapter.addEventHook(object : EventHook<ButtonModel.ViewHolder>(ButtonModel.ViewHolder::class.java) {
-            override fun onEvent(view: View, viewHolder: ButtonModel.ViewHolder, adapter: UUniversalAdapter) {
-                view.setOnClickListener {
-                    val absModel = adapter.getModel(viewHolder.adapterPosition)
-                    if (absModel is ButtonModel) {
-                        if (absModel === add1Btn) {
-                            adapter.addModel(TextModel(adapter.itemCount - btnList.size))
-                        }
-                        if (absModel === add10Btn) {
-                            val pos = adapter.itemCount - btnList.size
-                            adapter.addModels((0..9).map { TextModel(it + pos) })
-                        }
-                        if (absModel === addFirstBtn) {
-                            adapter.insertModelBefore(TextModel(insertId--), adapter.getModel(btnList.size))
-                        }
-                        if (absModel === insertBefore2Btn) {
-                            val model = adapter.getModel(btnList.size + 3 - 1)
-                            adapter.insertModelBefore(TextModel(insertId--), model)
-                        }
-                        if (absModel === insertAfter2Btn) {
-                            val model = adapter.getModel(btnList.size + 3 - 1)
-                            insertId -= 1
-                            adapter.insertModelAfter(TextModel(insertId--), model)
-                        }
-                        if (absModel === removeFirstBtn) {
-                            adapter.removeModel(adapter.getModel(btnList.size))
-                        }
-                        if (absModel === removeAllBtn) {
-                            adapter.removeAllAfterModel(btnList.last())
-                        }
-                        if (absModel === shuffleBtn) {
-                            val list = adapter.getAllModelListAfter(btnList.last())
-                            Collections.shuffle(list)
-                            btnList.reversed().map { list.add(0, it) }
-                            adapter.replaceAllModels(list)
-                        }
+        adapter.addEventHook(object : OnClickEventHook<ButtonModel.ViewHolder>(ButtonModel.ViewHolder::class.java) {
+            override fun onClick(view: View, viewHolder: ButtonModel.ViewHolder, position: Int, rawModel: UUniversalAdapter.AbstractModel<*>) {
+                if (rawModel is ButtonModel) {
+                    if (rawModel === add1Btn) {
+                        adapter.addModel(TextModel(adapter.itemCount - btnList.size))
+                    }
+                    if (rawModel === add10Btn) {
+                        val pos = adapter.itemCount - btnList.size
+                        adapter.addModels((0..9).map { TextModel(it + pos) })
+                    }
+                    if (rawModel === addFirstBtn) {
+                        adapter.insertModelBefore(TextModel(insertId--), adapter.getModel(btnList.size))
+                    }
+                    if (rawModel === insertBefore2Btn) {
+                        val model = adapter.getModel(btnList.size + 3 - 1)
+                        adapter.insertModelBefore(TextModel(insertId--), model)
+                    }
+                    if (rawModel === insertAfter2Btn) {
+                        val model = adapter.getModel(btnList.size + 3 - 1)
+                        insertId -= 1
+                        adapter.insertModelAfter(TextModel(insertId--), model)
+                    }
+                    if (rawModel === removeFirstBtn) {
+                        adapter.removeModel(adapter.getModel(btnList.size))
+                    }
+                    if (rawModel === removeAllBtn) {
+                        adapter.removeAllAfterModel(btnList.last())
+                    }
+                    if (rawModel === shuffleBtn) {
+                        val list = adapter.getAllModelListAfter(btnList.last())
+                        Collections.shuffle(list)
+                        btnList.reversed().map { list.add(0, it) }
+                        adapter.replaceAllModels(list)
                     }
                 }
             }
