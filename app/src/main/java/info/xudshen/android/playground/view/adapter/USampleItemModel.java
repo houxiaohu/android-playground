@@ -35,11 +35,13 @@ public class USampleItemModel extends UUniversalAdapter.AbstractModel<USampleIte
         holder.title.setText(data.getTitle());
     }
 
+    @NonNull
     @Override
     public UUniversalAdapter.IViewHolderCreator<ViewHolder> getViewHolderCreator() {
         return new UUniversalAdapter.IViewHolderCreator<ViewHolder>() {
+            @NonNull
             @Override
-            public ViewHolder create(View view) {
+            public ViewHolder create(@NonNull View view) {
                 return new ViewHolder(view);
             }
         };

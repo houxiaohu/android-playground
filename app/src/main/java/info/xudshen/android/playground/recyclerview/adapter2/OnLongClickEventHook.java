@@ -11,7 +11,8 @@ import static android.support.v7.widget.RecyclerView.NO_POSITION;
  * @since 2017/2/8
  */
 
-public abstract class OnLongClickEventHook<VH extends RecyclerView.ViewHolder> extends EventHook<VH> {
+public abstract class OnLongClickEventHook<VH extends RecyclerView.ViewHolder> extends
+        EventHook<VH> {
     public OnLongClickEventHook(@NonNull Class<VH> clazz) {
         super(clazz);
     }
@@ -27,10 +28,8 @@ public abstract class OnLongClickEventHook<VH extends RecyclerView.ViewHolder> e
             public boolean onLongClick(View v) {
                 int position = viewHolder.getAdapterPosition();
                 UUniversalAdapter.AbstractModel rawModel = adapter.getModel(position);
-                if (position != NO_POSITION && rawModel != null) {
-                    return OnLongClickEventHook.this.onLongClick(v, viewHolder, position, rawModel);
-                }
-                return false;
+                return position != NO_POSITION && rawModel != null
+                        && OnLongClickEventHook.this.onLongClick(v, viewHolder, position, rawModel);
             }
         });
     }

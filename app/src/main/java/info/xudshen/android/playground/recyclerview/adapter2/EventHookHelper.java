@@ -26,7 +26,7 @@ class EventHookHelper<VH extends RecyclerView.ViewHolder> {
 
     void add(@NonNull EventHook<VH> eventHook) {
         if (isAfterBind) {
-            throw new RuntimeException("can not add event hook after bind");
+            throw new IllegalStateException("can not add event hook after bind");
         }
         eventHooks.add(eventHook);
     }

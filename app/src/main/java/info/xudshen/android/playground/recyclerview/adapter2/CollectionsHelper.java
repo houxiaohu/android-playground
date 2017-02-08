@@ -1,5 +1,7 @@
 package info.xudshen.android.playground.recyclerview.adapter2;
 
+import android.support.annotation.Nullable;
+
 import java.util.List;
 
 /**
@@ -8,11 +10,13 @@ import java.util.List;
  */
 
 public class CollectionsHelper {
-    public static <T> T get(List<T> list, int index, T defaultValue) {
+    @Nullable
+    public static <T> T get(@Nullable List<T> list, int index, @Nullable T defaultValue) {
         return (list != null && index >= 0 && index < list.size()) ? list.get(index) : defaultValue;
     }
 
-    public static <T> T getOrNull(List<T> list, int index) {
+    @Nullable
+    public static <T> T getOrNull(@Nullable List<T> list, int index) {
         return get(list, index, null);
     }
 }

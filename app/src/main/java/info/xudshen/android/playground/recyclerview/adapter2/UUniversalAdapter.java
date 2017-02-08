@@ -28,6 +28,8 @@ import static android.view.View.NO_ID;
 public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String LOG_TAG = UUniversalAdapter.class.getSimpleName();
     private final ModelList models = new ModelList();
+
+    private final EventHookHelper eventHookHelper = new EventHookHelper(this);
     private boolean isAttached = false;
 
     //<editor-fold desc="GridLayout support">
@@ -51,8 +53,6 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
     //</editor-fold>
 
-    private EventHookHelper eventHookHelper = new EventHookHelper(this);
-
     public UUniversalAdapter() {
         setHasStableIds(true);
         spanSizeLookup.setSpanIndexCacheEnabled(true);
@@ -64,38 +64,41 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return position >= 0 && position < models.size() ? models.get(position) : null;
     }
 
-    protected List<AbstractModel<?>> getAllModelSubListAfter(AbstractModel<?> model) {
+    @NonNull
+    protected List<AbstractModel<?>> getAllModelSubListAfter(@Nullable AbstractModel<?> model) {
         int index = models.indexOf(model);
         if (index == -1) return Collections.emptyList();
         return models.subList(index + 1, models.size());
     }
 
-    public List<AbstractModel<?>> getAllModelListAfter(AbstractModel<?> model) {
+    @NonNull
+    public List<AbstractModel<?>> getAllModelListAfter(@Nullable AbstractModel<?> model) {
         int index = models.indexOf(model);
         if (index == -1) return Collections.emptyList();
 
         return new ArrayList<>(models.subList(index + 1, models.size()));
     }
 
-    public void addModel(AbstractModel<?> modelToAdd) {
+    public void addModel(@NonNull AbstractModel<?> modelToAdd) {
         final int initialSize = models.size();
 
         models.add(modelToAdd);
         notifyItemInserted(initialSize);
     }
 
-    public void addModels(AbstractModel<?>... modelsToAdd) {
+    public void addModels(@NonNull AbstractModel<?>... modelsToAdd) {
         addModels(Arrays.asList(modelsToAdd));
     }
 
-    public void addModels(Collection<? extends AbstractModel<?>> modelsToAdd) {
+    public void addModels(@NonNull Collection<? extends AbstractModel<?>> modelsToAdd) {
         final int initialSize = models.size();
 
         models.addAll(modelsToAdd);
         notifyItemRangeInserted(initialSize, modelsToAdd.size());
     }
 
-    public void insertModelBefore(AbstractModel<?> modelToInsert, AbstractModel<?> modelToInsertBefore) {
+    public void insertModelBefore(@NonNull AbstractModel<?> modelToInsert,
+                                  @Nullable AbstractModel<?> modelToInsertBefore) {
         int targetIndex = models.indexOf(modelToInsertBefore);
         if (targetIndex == -1) return;
 
@@ -103,7 +106,8 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyItemInserted(targetIndex);
     }
 
-    public void insertModelAfter(AbstractModel<?> modelToInsert, AbstractModel<?> modelToInsertAfter) {
+    public void insertModelAfter(@NonNull AbstractModel<?> modelToInsert,
+                                 @Nullable AbstractModel<?> modelToInsertAfter) {
         int modelIndex = models.indexOf(modelToInsertAfter);
         if (modelIndex == -1) return;
 
@@ -113,18 +117,18 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyItemInserted(targetIndex);
     }
 
-    public void notifyModelChanged(AbstractModel<?> model) {
+    public void notifyModelChanged(@NonNull AbstractModel<?> model) {
         notifyModelChanged(model, null);
     }
 
-    public void notifyModelChanged(AbstractModel<?> model, @Nullable Object payload) {
+    public void notifyModelChanged(@NonNull AbstractModel<?> model, @Nullable Object payload) {
         int index = models.indexOf(model);
         if (index != -1) {
             notifyItemChanged(index, payload);
         }
     }
 
-    public void removeModel(AbstractModel<?> modelToRemove) {
+    public void removeModel(@Nullable AbstractModel<?> modelToRemove) {
         int index = models.indexOf(modelToRemove);
         if (index >= 0 && index < models.size()) {
             models.remove(index);
@@ -140,7 +144,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyItemRangeRemoved(0, initialSize);
     }
 
-    public void removeAllAfterModel(AbstractModel<?> model) {
+    public void removeAllAfterModel(@Nullable AbstractModel<?> model) {
         final int initialSize = models.size();
 
         List<AbstractModel<?>> modelsToRemove = getAllModelSubListAfter(model);
@@ -169,16 +173,22 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
                 @Override
                 public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                    AbstractModel<?> oldModel = CollectionsHelper.getOrNull(models, oldItemPosition),
-                            newModel = CollectionsHelper.getOrNull(modelsToReplace, newItemPosition);
-                    return oldModel != null && newModel != null && oldModel.isItemTheSame(newModel);
+                    AbstractModel<?> oldModel = CollectionsHelper.getOrNull(models,
+                            oldItemPosition),
+                            newModel = CollectionsHelper.getOrNull(modelsToReplace,
+                                    newItemPosition);
+                    return oldModel != null && newModel != null
+                            && oldModel.isItemTheSame(newModel);
                 }
 
                 @Override
                 public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                    AbstractModel<?> oldModel = CollectionsHelper.getOrNull(models, oldItemPosition),
-                            newModel = CollectionsHelper.getOrNull(modelsToReplace, newItemPosition);
-                    return oldModel != null && newModel != null && oldModel.isContentTheSame(newModel);
+                    AbstractModel<?> oldModel = CollectionsHelper.getOrNull(models,
+                            oldItemPosition),
+                            newModel = CollectionsHelper.getOrNull(modelsToReplace,
+                                    newItemPosition);
+                    return oldModel != null && newModel != null
+                            && oldModel.isContentTheSame(newModel);
                 }
             });
             models.clear();
@@ -199,12 +209,13 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@Nullable RecyclerView.ViewHolder holder, int position) {
         onBindViewHolder(holder, position, Collections.emptyList());
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
+    public void onBindViewHolder(@Nullable RecyclerView.ViewHolder holder, int position,
+                                 @Nullable List<Object> payloads) {
         final AbstractModel model = getModel(position);
         if (holder == null || model == null) return;
 
@@ -243,16 +254,17 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     //<editor-fold desc="Model">
     private static class ViewHolderFactory {
-        private SparseArray<IViewHolderCreator<?>> creatorSparseArray = new SparseArray<>();
+        private final SparseArray<IViewHolderCreator<?>> creatorSparseArray = new SparseArray<>();
 
-        void register(AbstractModel<?> model) {
+        void register(@NonNull AbstractModel<?> model) {
             if (creatorSparseArray.get(model.getLayoutRes()) == null) {
                 creatorSparseArray.put(model.getLayoutRes(), model.getViewHolderCreator());
             }
         }
 
-        void register(Collection<? extends AbstractModel<?>> models) {
+        void register(@NonNull Collection<? extends AbstractModel<?>> models) {
             for (final AbstractModel model : models) {
+                if (model == null) continue;
                 if (creatorSparseArray.get(model.getLayoutRes()) == null) {
                     creatorSparseArray.put(model.getLayoutRes(), model.getViewHolderCreator());
                 }
@@ -262,35 +274,36 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         RecyclerView.ViewHolder create(@LayoutRes int viewType, @NonNull View view) {
             IViewHolderCreator<?> viewHolderCreator = creatorSparseArray.get(viewType);
             if (viewHolderCreator == null) {
-                throw new RuntimeException("cannot find viewHolderCreator for viewType=" + viewType);
+                throw new RuntimeException("cannot find viewHolderCreator for viewType="
+                        + viewType);
             }
             return viewHolderCreator.create(view);
         }
     }
 
     private static class ModelList extends ArrayList<AbstractModel<?>> {
-        private ViewHolderFactory viewHolderFactory = new ViewHolderFactory();
+        private final ViewHolderFactory viewHolderFactory = new ViewHolderFactory();
 
         @Override
-        public boolean add(AbstractModel<?> model) {
+        public boolean add(@NonNull AbstractModel<?> model) {
             viewHolderFactory.register(model);
             return super.add(model);
         }
 
         @Override
-        public void add(int index, AbstractModel<?> element) {
+        public void add(int index, @NonNull AbstractModel<?> element) {
             viewHolderFactory.register(element);
             super.add(index, element);
         }
 
         @Override
-        public boolean addAll(Collection<? extends AbstractModel<?>> c) {
+        public boolean addAll(@NonNull Collection<? extends AbstractModel<?>> c) {
             viewHolderFactory.register(c);
             return super.addAll(c);
         }
 
         @Override
-        public boolean addAll(int index, Collection<? extends AbstractModel<?>> c) {
+        public boolean addAll(int index, @NonNull Collection<? extends AbstractModel<?>> c) {
             viewHolderFactory.register(c);
             return super.addAll(index, c);
         }
@@ -332,6 +345,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             bindData(holder);
         }
 
+        @NonNull
         public abstract IViewHolderCreator<T> getViewHolderCreator();
 
         @Override
@@ -346,6 +360,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public interface IViewHolderCreator<VH extends RecyclerView.ViewHolder> {
+        @NonNull
         VH create(@NonNull View view);
     }
     //</editor-fold>
@@ -355,7 +370,8 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     /**
      * MUST be called before the ViewHolder is created
      */
-    public <VH extends RecyclerView.ViewHolder> void addEventHook(EventHook<VH> eventHook) {
+    public <VH extends RecyclerView.ViewHolder> void addEventHook(
+            @NonNull EventHook<VH> eventHook) {
         if (isAttached) {
             Log.w(LOG_TAG, "addEventHook is called after adapter attached");
         }
@@ -418,10 +434,8 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             @Override
             public boolean onLongClick(@NonNull View view, @NonNull RecyclerView.ViewHolder
                     viewHolder, int position, @NonNull AbstractModel rawModel) {
-                if (onItemLongClickListener != null) {
-                    return onItemLongClickListener.onLongClick(view, viewHolder, position, rawModel);
-                }
-                return false;
+                return onItemLongClickListener != null && onItemLongClickListener.onLongClick(
+                        view, viewHolder, position, rawModel);
             }
 
             @Nullable
@@ -433,7 +447,8 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         addEventHook(onItemLongClickEventHook);
     }
 
-    public void setOnItemLongClickListener(@Nullable OnItemLongClickListener onItemLongClickListener) {
+    public void setOnItemLongClickListener(@Nullable OnItemLongClickListener
+                                                   onItemLongClickListener) {
         if (isAttached && onItemLongClickEventHook == null && onItemLongClickListener != null) {
             throw new IllegalStateException("setOnItemLongClickListener " +
                     "must be called before the RecyclerView#setAdapter");
