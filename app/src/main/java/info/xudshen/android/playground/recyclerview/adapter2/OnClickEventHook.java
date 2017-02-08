@@ -1,7 +1,6 @@
 package info.xudshen.android.playground.recyclerview.adapter2;
 
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import static android.support.v7.widget.RecyclerView.NO_POSITION;
@@ -11,7 +10,7 @@ import static android.support.v7.widget.RecyclerView.NO_POSITION;
  * @since 2017/2/8
  */
 
-public abstract class OnClickEventHook<VH extends RecyclerView.ViewHolder> extends EventHook<VH> {
+public abstract class OnClickEventHook<VH extends UUniversalAdapter.ViewHolder> extends EventHook<VH> {
     public OnClickEventHook(@NonNull Class<VH> clazz) {
         super(clazz);
     }

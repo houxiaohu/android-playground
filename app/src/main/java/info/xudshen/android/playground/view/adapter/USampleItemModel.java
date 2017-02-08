@@ -2,7 +2,6 @@ package info.xudshen.android.playground.view.adapter;
 
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
@@ -47,7 +46,7 @@ public class USampleItemModel extends UUniversalAdapter.AbstractModel<USampleIte
         };
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends UUniversalAdapter.ViewHolder {
         private TextView title;
 
         public ViewHolder(View itemView) {

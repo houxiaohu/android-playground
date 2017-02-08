@@ -126,7 +126,7 @@ class UUniversalAdapterSampleFragment : Fragment() {
 
         override fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int = 2
 
-        class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+        class ViewHolder(itemView: View) : UUniversalAdapter.ViewHolder(itemView)
     }
 
 
@@ -146,6 +146,6 @@ class UUniversalAdapterSampleFragment : Fragment() {
         override fun isContentTheSame(item: UUniversalAdapter.AbstractModel<*>): Boolean
                 = item is TextModel && clicked == item.clicked
 
-        class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+        class ViewHolder(itemView: View) : UUniversalAdapter.ViewHolder(itemView)
     }
 }

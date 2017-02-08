@@ -2,7 +2,6 @@ package info.xudshen.android.playground.recyclerview.adapter2;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.List;
  * @since 2017/2/6
  */
 
-public abstract class EventHook<VH extends RecyclerView.ViewHolder> {
+public abstract class EventHook<VH extends UUniversalAdapter.ViewHolder> {
     @NonNull
     final Class<VH> clazz;
 

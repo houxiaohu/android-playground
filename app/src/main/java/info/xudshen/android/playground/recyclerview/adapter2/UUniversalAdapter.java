@@ -25,7 +25,7 @@ import static android.view.View.NO_ID;
  * @since 2017/2/6
  */
 
-public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.ViewHolder> {
     private static final String LOG_TAG = UUniversalAdapter.class.getSimpleName();
     private final ModelList models = new ModelList();
 
@@ -200,8 +200,8 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     //<editor-fold desc="Core">
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        RecyclerView.ViewHolder viewHolder = models.viewHolderFactory.create(viewType,
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        ViewHolder viewHolder = models.viewHolderFactory.create(viewType,
                 LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false));
 
         eventHookHelper.bind(viewHolder);
@@ -209,23 +209,22 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     @Override
-    public void onBindViewHolder(@Nullable RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@Nullable ViewHolder holder, int position) {
         onBindViewHolder(holder, position, Collections.emptyList());
     }
 
     @Override
-    public void onBindViewHolder(@Nullable RecyclerView.ViewHolder holder, int position,
+    public void onBindViewHolder(@Nullable ViewHolder holder, int position,
                                  @Nullable List<Object> payloads) {
         final AbstractModel model = getModel(position);
         if (holder == null || model == null) return;
 
-        if (payloads != null && !payloads.isEmpty()) {
-            // noinspection unchecked
-            model.bindData(holder, payloads);
-        } else {
-            // noinspection unchecked
-            model.bindData(holder);
-        }
+        holder.bind(model, payloads);
+    }
+
+    @Override
+    public void onViewRecycled(ViewHolder holder) {
+        holder.unbind();
     }
 
     @Override
@@ -253,6 +252,34 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     //</editor-fold>
 
     //<editor-fold desc="Model">
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        @Nullable
+        private AbstractModel model;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        private void bind(@NonNull AbstractModel model, @Nullable List<Object> payloads) {
+            if (payloads != null && !payloads.isEmpty()) {
+                // noinspection unchecked
+                model.bindData(this, payloads);
+            } else {
+                // noinspection unchecked
+                model.bindData(this);
+            }
+
+            this.model = model;
+        }
+
+        private void unbind() {
+            if (model == null) return;
+            // noinspection unchecked
+            model.unbind(this);
+            model = null;
+        }
+    }
+
     private static class ViewHolderFactory {
         private final SparseArray<IViewHolderCreator<?>> creatorSparseArray = new SparseArray<>();
 
@@ -271,7 +298,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             }
         }
 
-        RecyclerView.ViewHolder create(@LayoutRes int viewType, @NonNull View view) {
+        ViewHolder create(@LayoutRes int viewType, @NonNull View view) {
             IViewHolderCreator<?> viewHolderCreator = creatorSparseArray.get(viewType);
             if (viewHolderCreator == null) {
                 throw new RuntimeException("cannot find viewHolderCreator for viewType="
@@ -314,7 +341,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
      * otherwise may cause the {@link DiffUtil#calculateDiff(DiffUtil.Callback)} failed,
      * even "Inconsistency detected" exception
      */
-    public static abstract class AbstractModel<T extends RecyclerView.ViewHolder>
+    public static abstract class AbstractModel<T extends ViewHolder>
             implements IDiffUtilHelper<AbstractModel<?>> {
         private static long idCounter = -1;
         private long id;
@@ -345,6 +372,9 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             bindData(holder);
         }
 
+        public void unbind(@NonNull T holder) {
+        }
+
         @NonNull
         public abstract IViewHolderCreator<T> getViewHolderCreator();
 
@@ -359,7 +389,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-    public interface IViewHolderCreator<VH extends RecyclerView.ViewHolder> {
+    public interface IViewHolderCreator<VH extends ViewHolder> {
         @NonNull
         VH create(@NonNull View view);
     }
@@ -370,7 +400,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     /**
      * MUST be called before the ViewHolder is created
      */
-    public <VH extends RecyclerView.ViewHolder> void addEventHook(
+    public <VH extends ViewHolder> void addEventHook(
             @NonNull EventHook<VH> eventHook) {
         if (isAttached) {
             Log.w(LOG_TAG, "addEventHook is called after adapter attached");
@@ -384,13 +414,13 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Nullable
     private OnItemClickListener onItemClickListener;
     @Nullable
-    private EventHook<RecyclerView.ViewHolder> onItemClickEventHook;
+    private EventHook<ViewHolder> onItemClickEventHook;
 
     private void addOnItemClickEventHook() {
-        onItemClickEventHook = new OnClickEventHook<RecyclerView.ViewHolder>(
-                RecyclerView.ViewHolder.class) {
+        onItemClickEventHook = new OnClickEventHook<ViewHolder>(
+                ViewHolder.class) {
             @Override
-            public void onClick(@NonNull View view, @NonNull RecyclerView.ViewHolder viewHolder,
+            public void onClick(@NonNull View view, @NonNull ViewHolder viewHolder,
                                 int position, @NonNull AbstractModel rawModel) {
                 if (onItemClickListener != null) {
                     onItemClickListener.onClick(view, viewHolder, position, rawModel);
@@ -399,7 +429,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             @Nullable
             @Override
-            public View onBind(@NonNull RecyclerView.ViewHolder viewHolder) {
+            public View onBind(@NonNull ViewHolder viewHolder) {
                 return viewHolder.itemView;
             }
         };
@@ -417,7 +447,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public interface OnItemClickListener {
-        void onClick(@NonNull View itemView, @NonNull RecyclerView.ViewHolder viewHolder,
+        void onClick(@NonNull View itemView, @NonNull ViewHolder viewHolder,
                      int position, @NonNull AbstractModel<?> model);
     }
     //</editor-fold>
@@ -426,21 +456,20 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Nullable
     private OnItemLongClickListener onItemLongClickListener;
     @Nullable
-    private EventHook<RecyclerView.ViewHolder> onItemLongClickEventHook;
+    private EventHook<ViewHolder> onItemLongClickEventHook;
 
     private void addOnItemLongClickEventHook() {
-        onItemLongClickEventHook = new OnLongClickEventHook<
-                RecyclerView.ViewHolder>(RecyclerView.ViewHolder.class) {
+        onItemLongClickEventHook = new OnLongClickEventHook<ViewHolder>(ViewHolder.class) {
             @Override
-            public boolean onLongClick(@NonNull View view, @NonNull RecyclerView.ViewHolder
-                    viewHolder, int position, @NonNull AbstractModel rawModel) {
+            public boolean onLongClick(@NonNull View view, @NonNull ViewHolder viewHolder,
+                                       int position, @NonNull AbstractModel rawModel) {
                 return onItemLongClickListener != null && onItemLongClickListener.onLongClick(
                         view, viewHolder, position, rawModel);
             }
 
             @Nullable
             @Override
-            public View onBind(@NonNull RecyclerView.ViewHolder viewHolder) {
+            public View onBind(@NonNull ViewHolder viewHolder) {
                 return viewHolder.itemView;
             }
         };
@@ -459,7 +488,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public interface OnItemLongClickListener {
-        boolean onLongClick(@NonNull View itemView, @NonNull RecyclerView.ViewHolder viewHolder,
+        boolean onLongClick(@NonNull View itemView, @NonNull ViewHolder viewHolder,
                             int position, @NonNull AbstractModel<?> model);
     }
     //</editor-fold>

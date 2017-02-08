@@ -2,7 +2,6 @@ package info.xudshen.android.playground.recyclerview.adapter2;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.List;
  * @since 2017/2/6
  */
 
-class EventHookHelper<VH extends RecyclerView.ViewHolder> {
+class EventHookHelper<VH extends UUniversalAdapter.ViewHolder> {
     private boolean isAfterBind = false;
 
     @NonNull
@@ -31,7 +30,7 @@ class EventHookHelper<VH extends RecyclerView.ViewHolder> {
         eventHooks.add(eventHook);
     }
 
-    void bind(@NonNull RecyclerView.ViewHolder viewHolder) {
+    void bind(@NonNull UUniversalAdapter.ViewHolder viewHolder) {
         for (final EventHook<VH> eventHook : eventHooks) {
             if (!eventHook.clazz.isInstance(viewHolder)) continue;
             final VH vh = eventHook.clazz.cast(viewHolder);
