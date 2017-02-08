@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,10 @@ import static android.view.View.NO_ID;
  */
 
 public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final String LOG_TAG = UUniversalAdapter.class.getSimpleName();
     private final ModelList models = new ModelList();
+    private boolean isAttached = false;
+
     //<editor-fold desc="GridLayout support">
     private final GridLayoutManager.SpanSizeLookup spanSizeLookup = new GridLayoutManager
             .SpanSizeLookup() {
@@ -52,8 +56,6 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public UUniversalAdapter() {
         setHasStableIds(true);
         spanSizeLookup.setSpanIndexCacheEnabled(true);
-
-        addOnItemClickEventHook();
     }
 
     //<editor-fold desc="CRUD Method">
@@ -232,6 +234,11 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return model == null ? NO_ID : model.id();
     }
 
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        isAttached = true;
+    }
     //</editor-fold>
 
     //<editor-fold desc="Model">
@@ -344,22 +351,28 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     //</editor-fold>
 
     //<editor-fold desc="Event Hook">
+
+    /**
+     * MUST be called before the ViewHolder is created
+     */
     public <VH extends RecyclerView.ViewHolder> void addEventHook(EventHook<VH> eventHook) {
+        if (isAttached) {
+            Log.w(LOG_TAG, "addEventHook is called after adapter attached");
+        }
         // noinspection unchecked
         eventHookHelper.add(eventHook);
     }
     //</editor-fold>
 
     //<editor-fold desc="OnClickListener">
+    @Nullable
     private OnItemClickListener onItemClickListener;
-
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-    }
+    @Nullable
+    private EventHook<RecyclerView.ViewHolder> onItemClickEventHook;
 
     private void addOnItemClickEventHook() {
-        EventHook<RecyclerView.ViewHolder> onItemClickEventHook = new OnClickEventHook<
-                RecyclerView.ViewHolder>(RecyclerView.ViewHolder.class) {
+        onItemClickEventHook = new OnClickEventHook<RecyclerView.ViewHolder>(
+                RecyclerView.ViewHolder.class) {
             @Override
             public void onClick(@NonNull View view, @NonNull RecyclerView.ViewHolder viewHolder,
                                 int position, @NonNull AbstractModel rawModel) {
@@ -377,9 +390,62 @@ public class UUniversalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         addEventHook(onItemClickEventHook);
     }
 
+    public void setOnItemClickListener(@Nullable OnItemClickListener onItemClickListener) {
+        if (isAttached && onItemClickEventHook == null && onItemClickListener != null) {
+            throw new IllegalStateException("setOnItemClickListener " +
+                    "must be called before the RecyclerView#setAdapter");
+        } else if (!isAttached && onItemClickEventHook == null) {
+            addOnItemClickEventHook();
+        }
+        this.onItemClickListener = onItemClickListener;
+    }
+
     public interface OnItemClickListener {
         void onClick(@NonNull View itemView, @NonNull RecyclerView.ViewHolder viewHolder,
                      int position, @NonNull AbstractModel<?> model);
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="OnLongClickListener">
+    @Nullable
+    private OnItemLongClickListener onItemLongClickListener;
+    @Nullable
+    private EventHook<RecyclerView.ViewHolder> onItemLongClickEventHook;
+
+    private void addOnItemLongClickEventHook() {
+        onItemLongClickEventHook = new OnLongClickEventHook<
+                RecyclerView.ViewHolder>(RecyclerView.ViewHolder.class) {
+            @Override
+            public boolean onLongClick(@NonNull View view, @NonNull RecyclerView.ViewHolder
+                    viewHolder, int position, @NonNull AbstractModel rawModel) {
+                if (onItemLongClickListener != null) {
+                    return onItemLongClickListener.onLongClick(view, viewHolder, position, rawModel);
+                }
+                return false;
+            }
+
+            @Nullable
+            @Override
+            public View onBind(@NonNull RecyclerView.ViewHolder viewHolder) {
+                return viewHolder.itemView;
+            }
+        };
+        addEventHook(onItemLongClickEventHook);
+    }
+
+    public void setOnItemLongClickListener(@Nullable OnItemLongClickListener onItemLongClickListener) {
+        if (isAttached && onItemLongClickEventHook == null && onItemLongClickListener != null) {
+            throw new IllegalStateException("setOnItemLongClickListener " +
+                    "must be called before the RecyclerView#setAdapter");
+        } else if (!isAttached && onItemLongClickEventHook == null) {
+            addOnItemLongClickEventHook();
+        }
+        this.onItemLongClickListener = onItemLongClickListener;
+    }
+
+    public interface OnItemLongClickListener {
+        boolean onLongClick(@NonNull View itemView, @NonNull RecyclerView.ViewHolder viewHolder,
+                            int position, @NonNull AbstractModel<?> model);
     }
     //</editor-fold>
 }

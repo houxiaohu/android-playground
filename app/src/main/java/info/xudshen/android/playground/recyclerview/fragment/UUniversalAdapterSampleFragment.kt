@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import info.xudshen.android.playground.R
-import info.xudshen.android.playground.recyclerview.adapter2.OnClickEventHook
+import info.xudshen.android.playground.recyclerview.adapter2.OnLongClickEventHook
 import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter
 import kotlinx.android.synthetic.main.fragment_uuniversal_adapter_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -48,8 +48,6 @@ class UUniversalAdapterSampleFragment : Fragment() {
         list.layoutManager = GridLayoutManager(context, 4)
         (list.layoutManager as GridLayoutManager).spanSizeLookup = adapter.spanSizeLookup
 
-        list.adapter = adapter
-
         adapter.setOnItemClickListener { view, vh, pos, absModel ->
             when (absModel) {
                 is ButtonModel -> {
@@ -64,8 +62,8 @@ class UUniversalAdapterSampleFragment : Fragment() {
 
         var insertId = 10000
 
-        adapter.addEventHook(object : OnClickEventHook<ButtonModel.ViewHolder>(ButtonModel.ViewHolder::class.java) {
-            override fun onClick(view: View, viewHolder: ButtonModel.ViewHolder, position: Int, rawModel: UUniversalAdapter.AbstractModel<*>) {
+        adapter.addEventHook(object : OnLongClickEventHook<ButtonModel.ViewHolder>(ButtonModel.ViewHolder::class.java) {
+            override fun onLongClick(view: View, viewHolder: ButtonModel.ViewHolder, position: Int, rawModel: UUniversalAdapter.AbstractModel<*>): Boolean {
                 if (rawModel is ButtonModel) {
                     if (rawModel === add1Btn) {
                         adapter.addModel(TextModel(adapter.itemCount - btnList.size))
@@ -99,12 +97,15 @@ class UUniversalAdapterSampleFragment : Fragment() {
                         adapter.replaceAllModels(list)
                     }
                 }
+                return true
             }
 
             override fun onBind(viewHolder: ButtonModel.ViewHolder): View? {
                 return viewHolder.itemView.section_title
             }
         })
+
+        list.adapter = adapter
     }
 
     override fun onResume() {
