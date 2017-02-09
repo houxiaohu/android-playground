@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import info.xudshen.android.playground.R
+import info.xudshen.android.playground.recyclerview.adapter2.AbstractLoadMoreModel
 import info.xudshen.android.playground.recyclerview.adapter2.SimpleListAdapter
 import kotlinx.android.synthetic.main.fragment_simple_list_adapter_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -43,6 +44,10 @@ class SimpleListAdapterSampleFragment : Fragment() {
         var headerCount = 100001
         var footerCount = 200001
         var dataCount = 0
+
+        var hasMore = false
+        var loadMoreState = AbstractLoadMoreModel.COMPLETE
+
         add_header.setOnClickListener {
             adapter.addHeader(UUniversalAdapterSampleFragment.TextModel(headerCount++))
         }
@@ -52,7 +57,8 @@ class SimpleListAdapterSampleFragment : Fragment() {
         insert_data.setOnClickListener {
             adapter.addDataModels((0..5).map {
                 UUniversalAdapterSampleFragment.TextModel(dataCount + it)
-            })
+            }, hasMore)
+            adapter.setLoadMoreState(loadMoreState)
             dataCount += 6
         }
         insert_data_1.setOnClickListener {
@@ -61,7 +67,8 @@ class SimpleListAdapterSampleFragment : Fragment() {
         reload_data.setOnClickListener {
             adapter.updateDataModels((0..3).map {
                 UUniversalAdapterSampleFragment.TextModel(dataCount + it)
-            })
+            }, hasMore)
+            adapter.setLoadMoreState(loadMoreState)
             dataCount += 4
         }
         remove_header.setOnClickListener {
@@ -80,5 +87,44 @@ class SimpleListAdapterSampleFragment : Fragment() {
                         adapter.dataModels.map { it.id().toString() }.reduce { id1, id2 -> "$id1,$id2" },
                     Toast.LENGTH_LONG).show()
         }
+
+        var checkLoadMoreState = fun(view: View) {
+            if (view == load_no_more) {
+                hasMore = !hasMore
+                load_no_more.isChecked = hasMore
+                if (!hasMore) {
+                    load_start.isChecked = false
+                    load_complete.isChecked = false
+                    load_failed.isChecked = false
+                }
+                adapter.setHasMore(hasMore)
+            } else if (view == load_start) {
+                if (hasMore) {
+                    loadMoreState = AbstractLoadMoreModel.START
+                    load_start.isChecked = true
+                    load_complete.isChecked = false
+                    load_failed.isChecked = false
+                }
+            } else if (view == load_complete) {
+                if (hasMore) {
+                    loadMoreState = AbstractLoadMoreModel.COMPLETE
+                    load_start.isChecked = false
+                    load_complete.isChecked = true
+                    load_failed.isChecked = false
+                }
+            } else if (view == load_failed) {
+                if (hasMore) {
+                    loadMoreState = AbstractLoadMoreModel.FAILED
+                    load_start.isChecked = false
+                    load_complete.isChecked = false
+                    load_failed.isChecked = true
+                }
+            }
+        }
+
+        load_no_more.setOnClickListener { checkLoadMoreState(it) }
+        load_start.setOnClickListener { checkLoadMoreState(it) }
+        load_complete.setOnClickListener { checkLoadMoreState(it) }
+        load_failed.setOnClickListener { checkLoadMoreState(it) }
     }
 }

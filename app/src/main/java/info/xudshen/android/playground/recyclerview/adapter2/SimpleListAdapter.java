@@ -2,6 +2,8 @@ package info.xudshen.android.playground.recyclerview.adapter2;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,15 +13,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import info.xudshen.android.playground.R;
+
 /**
  * @author xudong
  * @since 2017/2/9
  */
 
 public class SimpleListAdapter extends UUniversalAdapter {
-    private OrderedMap<Long, AbstractModel<?>> headers = new OrderedMap<>(),
+    private final OrderedMap<Long, AbstractModel<?>> headers = new OrderedMap<>(),
             footers = new OrderedMap<>();
 
+    private boolean hasMore = false;
+    @NonNull
+    private AbstractLoadMoreModel<?> loadMoreModel = new LoadMoreModel();
+
+    @Nullable
+    private AbstractModel<?> getLoadMoreOrFirstFooter() {
+        return hasMore ? loadMoreModel : footers.getFirst();
+    }
+
+    //<editor-fold desc="Headers">
     public Collection<? extends AbstractModel<?>> getHeaders() {
         return headers.values();
     }
@@ -43,7 +57,9 @@ public class SimpleListAdapter extends UUniversalAdapter {
         headers.remove(model.id());
         return true;
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Footers">
     public Collection<? extends AbstractModel<?>> getFooters() {
         return footers.values();
     }
@@ -67,38 +83,129 @@ public class SimpleListAdapter extends UUniversalAdapter {
         footers.remove(model.id());
         return true;
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Data Models">
     public Collection<? extends AbstractModel<?>> getDataModels() {
-        return getAllModelListBetween(headers.getLast(), footers.getFirst());
+        return getAllModelListBetween(headers.getLast(), getLoadMoreOrFirstFooter());
     }
 
     public <M extends AbstractModel> void addDataModel(@NonNull M model) {
-        if (footers.size() == 0) {
+        AbstractModel lastModel = getLoadMoreOrFirstFooter();
+        if (lastModel == null) {
             addModel(model);
         } else {
-            insertModelBefore(model, footers.getFirst());
+            insertModelBefore(model, lastModel);
         }
     }
 
     public void addDataModels(@NonNull AbstractModel<?>... modelsToAdd) {
-        addDataModels(Arrays.asList(modelsToAdd));
+        addDataModels(Arrays.asList(modelsToAdd), hasMore);
     }
 
     public void addDataModels(@NonNull Collection<? extends AbstractModel<?>> modelsToAdd) {
-        if (footers.size() == 0) {
+        addDataModels(modelsToAdd, hasMore);
+    }
+
+    public void addDataModels(@NonNull Collection<? extends AbstractModel<?>> modelsToAdd,
+                              boolean hasMore) {
+        setHasMore(hasMore);
+        AbstractModel lastModel = getLoadMoreOrFirstFooter();
+        if (lastModel == null) {
             addModels(modelsToAdd);
         } else {
-            insertModelsBefore(modelsToAdd, footers.getFirst());
+            insertModelsBefore(modelsToAdd, lastModel);
         }
     }
 
     public void updateDataModels(@NonNull Collection<? extends AbstractModel<?>> newDataModels) {
+        updateDataModels(newDataModels, hasMore);
+    }
+
+    public void updateDataModels(@NonNull Collection<? extends AbstractModel<?>> newDataModels,
+                                 boolean hasMore) {
         List<AbstractModel<?>> newModels = new ArrayList<>();
         newModels.addAll(headers.values());
         newModels.addAll(newDataModels);
+        if (hasMore) newModels.add(loadMoreModel);
         newModels.addAll(footers.values());
 
         replaceAllModels(newModels);
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Load More">
+    public final void setHasMore(boolean hasMore) {
+        if (this.hasMore == hasMore) return;
+
+        this.hasMore = hasMore;
+        if (hasMore) {
+            //show
+            if (footers.size() == 0) {
+                addModels(loadMoreModel);
+            } else {
+                insertModelBefore(loadMoreModel, footers.getFirst());
+            }
+        } else {
+            //hide
+            loadMoreModel.setState(AbstractLoadMoreModel.COMPLETE);
+            removeModel(loadMoreModel);
+        }
+    }
+
+    public final void setLoadMoreModel(@NonNull AbstractLoadMoreModel<?> loadMoreModel) {
+        this.loadMoreModel = loadMoreModel;
+    }
+
+    public final void setLoadMoreState(@AbstractLoadMoreModel.LoadMoreState int state) {
+        if (!hasMore) return;
+
+        loadMoreModel.setState(state);
+        notifyModelChanged(loadMoreModel);
+    }
+    //</editor-fold>
+
+    private static class LoadMoreModel extends AbstractLoadMoreModel<LoadMoreModel.ViewHolder> {
+        @Override
+        public int getLayoutRes() {
+            return R.layout.layout_load_more_item;
+        }
+
+        @Override
+        public void onLoadMoreStart(@NonNull ViewHolder holder) {
+            holder.title.setText("loading...");
+        }
+
+        @Override
+        public void onLoadMoreComplete(@NonNull ViewHolder holder) {
+            holder.title.setText("click to load");
+        }
+
+        @Override
+        public void onLoadMoreFailed(@NonNull ViewHolder holder) {
+            holder.title.setText("click to retry");
+        }
+
+        @NonNull
+        @Override
+        public IViewHolderCreator<ViewHolder> getViewHolderCreator() {
+            return new IViewHolderCreator<ViewHolder>() {
+                @NonNull
+                @Override
+                public ViewHolder create(@NonNull View view) {
+                    return new ViewHolder(view);
+                }
+            };
+        }
+
+        public class ViewHolder extends UUniversalAdapter.ViewHolder {
+            private TextView title;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                title = ((TextView) itemView.findViewById(R.id.section_title));
+            }
+        }
     }
 
     private class OrderedMap<K, V> implements Iterable<V> {
@@ -182,5 +289,4 @@ public class SimpleListAdapter extends UUniversalAdapter {
             };
         }
     }
-
 }
