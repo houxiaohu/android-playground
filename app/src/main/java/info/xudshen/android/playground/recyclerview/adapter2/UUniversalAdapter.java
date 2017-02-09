@@ -86,11 +86,30 @@ public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.Vi
         return new ArrayList<>(models.subList(index + 1, models.size()));
     }
 
+    @NonNull
+    public List<AbstractModel<?>> getAllModelListBetween(@Nullable AbstractModel<?> start,
+                                                         @Nullable AbstractModel<?> end) {
+        int startIdx = models.indexOf(start),
+                endIdx = models.indexOf(end);
+        startIdx = startIdx == -1 ? 0 : startIdx + 1;
+        endIdx = endIdx == -1 ? models.size() : endIdx;
+        if (startIdx > endIdx) return Collections.emptyList();
+
+        return new ArrayList<>(models.subList(startIdx, endIdx));
+    }
+
     public void addModel(@NonNull AbstractModel<?> modelToAdd) {
         final int initialSize = models.size();
 
         models.add(modelToAdd);
         notifyItemInserted(initialSize);
+    }
+
+    public void addModel(int index, @NonNull AbstractModel<?> modelToAdd) {
+        if (index > models.size() || index < 0) return;
+
+        models.add(index, modelToAdd);
+        notifyItemInserted(index);
     }
 
     public void addModels(@NonNull AbstractModel<?>... modelsToAdd) {
@@ -113,6 +132,15 @@ public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.Vi
         notifyItemInserted(targetIndex);
     }
 
+    public void insertModelsBefore(@NonNull Collection<? extends AbstractModel<?>> modelsToInsert,
+                                   @Nullable AbstractModel<?> modelToInsertBefore) {
+        int targetIndex = models.indexOf(modelToInsertBefore);
+        if (targetIndex == -1) return;
+
+        models.addAll(targetIndex, modelsToInsert);
+        notifyItemRangeInserted(targetIndex, modelsToInsert.size());
+    }
+
     public void insertModelAfter(@NonNull AbstractModel<?> modelToInsert,
                                  @Nullable AbstractModel<?> modelToInsertAfter) {
         int modelIndex = models.indexOf(modelToInsertAfter);
@@ -122,6 +150,17 @@ public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.Vi
 
         models.add(targetIndex, modelToInsert);
         notifyItemInserted(targetIndex);
+    }
+
+    public void insertModelsAfter(@NonNull Collection<? extends AbstractModel<?>> modelsToInsert,
+                                  @Nullable AbstractModel<?> modelToInsertAfter) {
+        int modelIndex = models.indexOf(modelToInsertAfter);
+        if (modelIndex == -1) return;
+
+        int targetIndex = modelIndex + 1;
+
+        models.addAll(targetIndex, modelsToInsert);
+        notifyItemRangeInserted(targetIndex, modelsToInsert.size());
     }
 
     public void notifyModelChanged(@NonNull AbstractModel<?> model) {

@@ -5,6 +5,7 @@ import info.xudshen.android.playground.animation.svg.fragment.SvgSampleFragment
 import info.xudshen.android.playground.imageloader.fragment.UILSampleFragment
 import info.xudshen.android.playground.model.SampleItemModel
 import info.xudshen.android.playground.recyclerview.fragment.ItemDecorationSampleFragment
+import info.xudshen.android.playground.recyclerview.fragment.SimpleListAdapterSampleFragment
 import info.xudshen.android.playground.recyclerview.fragment.UUniversalAdapterSampleFragment
 
 /**
@@ -16,7 +17,8 @@ object SampleItemDataSource {
             SampleItemModel(title = "Svg Sample", clazz = SvgSampleFragment::class.java),
             SampleItemModel(title = "UIL Usage with MATCH_PARENT and RecyclerView", cover = R.drawable.uil_sample_cover, clazz = UILSampleFragment::class.java),
             SampleItemModel(title = "RecyclerView ItemPadding Decoration", cover = R.drawable.item_padding_decoration_cover, clazz = ItemDecorationSampleFragment::class.java),
-            SampleItemModel(title = "UUniversalAdapter", clazz = UUniversalAdapterSampleFragment::class.java)
+            SampleItemModel(title = "UUniversalAdapter", clazz = UUniversalAdapterSampleFragment::class.java),
+            SampleItemModel(title = "SimpleListAdapter", clazz = SimpleListAdapterSampleFragment::class.java)
     ).reversed()
 
     val IMAGE_DATA: List<String> = listOf(
