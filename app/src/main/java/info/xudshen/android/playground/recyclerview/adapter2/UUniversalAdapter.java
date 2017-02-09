@@ -1,5 +1,6 @@
 package info.xudshen.android.playground.recyclerview.adapter2;
 
+import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,6 +8,7 @@ import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.LongSparseArray;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,10 +29,15 @@ import static android.view.View.NO_ID;
 
 public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.ViewHolder> {
     private static final String LOG_TAG = UUniversalAdapter.class.getSimpleName();
+    private static final String SAVED_STATE_ARG_VIEW_HOLDERS = "saved_state_view_holders";
+
     private final ModelList models = new ModelList();
 
     private final EventHookHelper eventHookHelper = new EventHookHelper(this);
     private boolean isAttached = false;
+
+    private final LongSparseArray<ViewHolder> boundViewHolders = new LongSparseArray<>();
+    private ViewHolderState viewHolderState = new ViewHolderState();
 
     //<editor-fold desc="GridLayout support">
     private final GridLayoutManager.SpanSizeLookup spanSizeLookup = new GridLayoutManager
@@ -219,11 +226,29 @@ public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.Vi
         final AbstractModel model = getModel(position);
         if (holder == null || model == null) return;
 
+        // A ViewHolder can be bound again even it is already bound and showing, like when it is on
+        // screen and is changed. In this case we need
+        // to carry the state of the previous view over to the new view. This may not be necessary if
+        // the viewholder is reused (see RecyclerView.ItemAnimator#canReuseUpdatedViewHolder)
+        // but we don't rely on that to be safe and to simplify
+        // ??????????
+        if (boundViewHolders.get(holder.getItemId()) != null) {
+            viewHolderState.save(boundViewHolders.get(holder.getItemId()));
+        }
+
         holder.bind(model, payloads);
+
+        viewHolderState.restore(holder);
+        boundViewHolders.put(holder.getItemId(), holder);
     }
 
     @Override
-    public void onViewRecycled(ViewHolder holder) {
+    public void onViewRecycled(@Nullable ViewHolder holder) {
+        if (holder == null) return;
+
+        viewHolderState.save(holder);
+        boundViewHolders.remove(holder.getItemId());
+
         holder.unbind();
     }
 
@@ -248,6 +273,38 @@ public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.Vi
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         isAttached = true;
+    }
+
+    public void onSaveInstanceState(Bundle outState) {
+        for (int i = 0; i < boundViewHolders.size(); i++) {
+            long key = boundViewHolders.keyAt(i);
+            viewHolderState.save(boundViewHolders.get(key));
+        }
+
+        if (viewHolderState.size() > 0 && !hasStableIds()) {
+            throw new IllegalStateException("Must have stable ids when saving view holder state");
+        }
+
+        outState.putParcelable(SAVED_STATE_ARG_VIEW_HOLDERS, viewHolderState);
+    }
+
+    public void onRestoreInstanceState(@Nullable Bundle inState) {
+        // To simplify things we enforce that state is restored before views are bound, otherwise it
+        // is more difficult to update view state once they are bound
+        if (boundViewHolders.size() > 0) {
+            throw new IllegalStateException(
+                    "State cannot be restored once views have been bound. It should be done before adding "
+                            + "the adapter to the recycler view.");
+        }
+
+        if (inState != null) {
+            ViewHolderState savedState = inState.getParcelable(SAVED_STATE_ARG_VIEW_HOLDERS);
+            if (savedState != null) {
+                viewHolderState = savedState;
+            } else {
+                Log.w(LOG_TAG, "can not get save viewholder state");
+            }
+        }
     }
     //</editor-fold>
 
@@ -277,6 +334,10 @@ public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.Vi
             // noinspection unchecked
             model.unbind(this);
             model = null;
+        }
+
+        boolean shouldSaveViewState() {
+            return model != null && model.shouldSaveViewState();
         }
     }
 
@@ -343,7 +404,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.Vi
      */
     public static abstract class AbstractModel<T extends ViewHolder>
             implements IDiffUtilHelper<AbstractModel<?>> {
-        private static long idCounter = -1;
+        private static long idCounter = NO_ID - 1;
         private long id;
 
         protected AbstractModel(long id) {
@@ -360,6 +421,10 @@ public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.Vi
 
         public int getSpanSize(int totalSpanCount, int position, int itemCount) {
             return 1;
+        }
+
+        public boolean shouldSaveViewState() {
+            return false;
         }
 
         @LayoutRes

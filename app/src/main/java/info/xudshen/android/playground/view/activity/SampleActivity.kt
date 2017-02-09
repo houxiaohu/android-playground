@@ -16,9 +16,12 @@ class SampleActivity : AppCompatActivity() {
         val index = intent.getIntExtra(KEY_INDEX, 0)
         val itemModel = SampleItemDataSource.DATA.elementAtOrNull(index)
 
-        val fragment = itemModel?.clazz?.newInstance()
-        supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container, fragment).commit()
+        var fragment = supportFragmentManager.findFragmentByTag(itemModel?.clazz?.name)
+        if (fragment == null) {
+            fragment = itemModel?.clazz?.newInstance()
+            supportFragmentManager.beginTransaction()
+                    .add(R.id.fragment_container, fragment, itemModel?.clazz?.name).commit()
+        }
     }
 
     companion object {

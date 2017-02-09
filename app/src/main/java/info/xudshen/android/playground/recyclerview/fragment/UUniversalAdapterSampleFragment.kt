@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,8 @@ import java.util.*
  */
 
 class UUniversalAdapterSampleFragment : Fragment() {
-    val adapter = UUniversalAdapter()
+    //not right, just for no more error
+    var adapter: UUniversalAdapter = UUniversalAdapter()
 
     val add1Btn = ButtonModel("add 1")
     val add10Btn = ButtonModel("add 10")
@@ -35,6 +35,11 @@ class UUniversalAdapterSampleFragment : Fragment() {
     val shuffleBtn = ButtonModel("shuffle")
     val btnList = listOf(add1Btn, add10Btn, addFirstBtn, insertBefore2Btn, insertAfter2Btn, removeFirstBtn, removeAllBtn, shuffleBtn)
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
             = inflater?.inflate(R.layout.fragment_uuniversal_adapter_sample, container, false)
 
@@ -44,6 +49,7 @@ class UUniversalAdapterSampleFragment : Fragment() {
         (activity as AppCompatActivity?)?.setSupportActionBar(toolbar)
         (activity as AppCompatActivity?)?.title = "UUniversalAdapter"
 
+        adapter = UUniversalAdapter()
         adapter.setSpanCount(4)
         list.layoutManager = GridLayoutManager(context, 4)
         (list.layoutManager as GridLayoutManager).spanSizeLookup = adapter.spanSizeLookup
@@ -112,6 +118,18 @@ class UUniversalAdapterSampleFragment : Fragment() {
         super.onResume()
 
         adapter.addModels(btnList)
+        val pos = adapter.itemCount - btnList.size
+        adapter.addModels((0..20).map { TextModel(it + pos) })
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        adapter.onSaveInstanceState(outState)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        adapter.onRestoreInstanceState(savedInstanceState)
     }
 
     class ButtonModel(var title: String) : UUniversalAdapter.AbstractModel<ButtonModel.ViewHolder>() {
@@ -139,6 +157,16 @@ class UUniversalAdapterSampleFragment : Fragment() {
         override fun bindData(holder: ViewHolder) {
             holder.itemView.section_title.text = if (clicked) "$index clicked" else "$index"
         }
+
+        override fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int = totalSpanCount
+
+        override fun shouldSaveViewState(): Boolean = true
+
+        override fun unbind(holder: ViewHolder) {
+            holder.itemView.input.setText("")
+        }
+
+        override fun id(): Long = index.toLong()
 
         override fun isItemTheSame(item: UUniversalAdapter.AbstractModel<*>): Boolean
                 = item is TextModel && index == item.index
