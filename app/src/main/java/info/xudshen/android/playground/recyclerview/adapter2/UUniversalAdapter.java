@@ -71,6 +71,10 @@ public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.Vi
         return position >= 0 && position < models.size() ? models.get(position) : null;
     }
 
+    protected boolean containsModel(AbstractModel<?> model) {
+        return models.indexOf(model) >= 0;
+    }
+
     @NonNull
     protected List<AbstractModel<?>> getAllModelSubListAfter(@Nullable AbstractModel<?> model) {
         int index = models.indexOf(model);

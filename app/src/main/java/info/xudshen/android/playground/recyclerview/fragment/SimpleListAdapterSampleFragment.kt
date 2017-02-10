@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import info.xudshen.android.playground.R
 import info.xudshen.android.playground.recyclerview.adapter2.AbstractLoadMoreModel
-import info.xudshen.android.playground.recyclerview.adapter2.SimpleListAdapter
+import info.xudshen.android.playground.recyclerview.adapter2.USimpleListAdapter
 import kotlinx.android.synthetic.main.fragment_simple_list_adapter_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 
@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.include_toolbar.*
  */
 
 class SimpleListAdapterSampleFragment : Fragment() {
-    var adapter = SimpleListAdapter()
+    var adapter = USimpleListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,9 +35,9 @@ class SimpleListAdapterSampleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as AppCompatActivity?)?.setSupportActionBar(toolbar)
-        (activity as AppCompatActivity?)?.title = "SimpleListAdapter"
+        (activity as AppCompatActivity?)?.title = "AbstractListAdapter"
 
-        adapter = SimpleListAdapter()
+        adapter = USimpleListAdapter()
         list.layoutManager = LinearLayoutManager(context)
         list.adapter = adapter
 
@@ -55,17 +55,17 @@ class SimpleListAdapterSampleFragment : Fragment() {
             adapter.addFooter(UUniversalAdapterSampleFragment.TextModel(footerCount++))
         }
         insert_data.setOnClickListener {
-            adapter.addDataModels((0..5).map {
+            adapter.addDataList((0..5).map {
                 UUniversalAdapterSampleFragment.TextModel(dataCount + it)
             }, hasMore)
             adapter.setLoadMoreState(loadMoreState)
             dataCount += 6
         }
         insert_data_1.setOnClickListener {
-            adapter.addDataModel(UUniversalAdapterSampleFragment.TextModel(dataCount++))
+            adapter.addData(UUniversalAdapterSampleFragment.TextModel(dataCount++))
         }
         reload_data.setOnClickListener {
-            adapter.updateDataModels((0..3).map {
+            adapter.updateDataList((0..3).map {
                 UUniversalAdapterSampleFragment.TextModel(dataCount + it)
             }, hasMore)
             adapter.setLoadMoreState(loadMoreState)
@@ -83,8 +83,8 @@ class SimpleListAdapterSampleFragment : Fragment() {
         }
         get_data.setOnClickListener {
             Toast.makeText(context,
-                    if (adapter.dataModels.isEmpty()) "" else
-                        adapter.dataModels.map { it.id().toString() }.reduce { id1, id2 -> "$id1,$id2" },
+                    if (adapter.dataList.isEmpty()) "" else
+                        adapter.dataList.map { it.id().toString() }.reduce { id1, id2 -> "$id1,$id2" },
                     Toast.LENGTH_LONG).show()
         }
 

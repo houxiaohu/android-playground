@@ -8,6 +8,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -16,30 +17,43 @@ import java.util.NoSuchElementException;
 import info.xudshen.android.playground.R;
 
 /**
+ * including header, data, loadMore, footer, emptyView part
+ *
  * @author xudong
  * @since 2017/2/9
  */
-
-public class SimpleListAdapter extends UUniversalAdapter {
+public abstract class HeaderFooterListAdapter<T> extends UUniversalAdapter {
+    @NonNull
     private final OrderedMap<Long, AbstractModel<?>> headers = new OrderedMap<>(),
             footers = new OrderedMap<>();
+    @NonNull
+    protected final List<T> dataList = new ArrayList<>();
 
     private boolean hasMore = false;
     @NonNull
     private AbstractLoadMoreModel<?> loadMoreModel = new LoadMoreModel();
 
     @Nullable
+    private AbstractModel<?> emptyViewModel = null;
+
+    @Nullable
+    private AbstractModel<?> getLastHeader() {
+        return headers.getLastOrNull();
+    }
+
+    @Nullable
     private AbstractModel<?> getLoadMoreOrFirstFooter() {
-        return hasMore ? loadMoreModel : footers.getFirst();
+        return hasMore ? loadMoreModel : footers.getFirstOrNull();
     }
 
     //<editor-fold desc="Headers">
-    public Collection<? extends AbstractModel<?>> getHeaders() {
+    @NonNull
+    public final Collection<? extends AbstractModel<?>> getHeaders() {
         return headers.values();
     }
 
-    public <M extends AbstractModel> boolean addHeader(@NonNull M model) {
-        if (headers.get(model.id()) != null) {
+    public final <M extends AbstractModel> boolean addHeader(@NonNull M model) {
+        if (headers.checkExistAndConsistency(model.id())) {
             return false;
         }
 
@@ -48,8 +62,8 @@ public class SimpleListAdapter extends UUniversalAdapter {
         return true;
     }
 
-    public <M extends AbstractModel> boolean removeHeader(@NonNull M model) {
-        if (headers.get(model.id()) == null) {
+    public final <M extends AbstractModel> boolean removeHeader(@NonNull M model) {
+        if (!headers.checkExistAndConsistency(model.id())) {
             return false;
         }
 
@@ -60,12 +74,13 @@ public class SimpleListAdapter extends UUniversalAdapter {
     //</editor-fold>
 
     //<editor-fold desc="Footers">
-    public Collection<? extends AbstractModel<?>> getFooters() {
+    @NonNull
+    public final Collection<? extends AbstractModel<?>> getFooters() {
         return footers.values();
     }
 
-    public <M extends AbstractModel> boolean addFooter(@NonNull M model) {
-        if (footers.get(model.id()) != null) {
+    public final <M extends AbstractModel> boolean addFooter(@NonNull M model) {
+        if (footers.checkExistAndConsistency(model.id())) {
             return false;
         }
 
@@ -74,8 +89,8 @@ public class SimpleListAdapter extends UUniversalAdapter {
         return true;
     }
 
-    public <M extends AbstractModel> boolean removeFooter(@NonNull M model) {
-        if (footers.get(model.id()) == null) {
+    public final <M extends AbstractModel> boolean removeFooter(@NonNull M model) {
+        if (!footers.checkExistAndConsistency(model.id())) {
             return false;
         }
 
@@ -85,52 +100,161 @@ public class SimpleListAdapter extends UUniversalAdapter {
     }
     //</editor-fold>
 
+    //<editor-fold desc="EmptyView">
+
+    /**
+     * get data models size
+     * derived class can override this logic
+     */
+    protected boolean isDataListEmpty() {
+        return dataList.isEmpty();
+    }
+
+    /**
+     * set emtpy view model and remove previous model if exists
+     */
+    public final void setEmptyViewModel(@Nullable AbstractModel<?> emptyViewModel) {
+        if (this.emptyViewModel == emptyViewModel) return;
+
+        if (this.emptyViewModel != null) {
+            removeModel(emptyViewModel);
+        }
+        this.emptyViewModel = emptyViewModel;
+    }
+
+    /**
+     * when dataList.isEmpty(), show empty view model; otherwise, remove it
+     */
+    protected void checkEmptyView() {
+        if (isDataListEmpty()) {
+            if (emptyViewModel != null && containsModel(emptyViewModel)) {
+                addModel(headers.size(), emptyViewModel);
+            }
+        } else {
+            removeModel(emptyViewModel);
+        }
+    }
+    //</editor-fold>
+
     //<editor-fold desc="Data Models">
-    public Collection<? extends AbstractModel<?>> getDataModels() {
-        return getAllModelListBetween(headers.getLast(), getLoadMoreOrFirstFooter());
+
+    /**
+     * convert {@link T} data to
+     * {@link info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter.AbstractModel}
+     */
+    @NonNull
+    abstract Collection<? extends AbstractModel<?>> transData(@NonNull T data);
+
+    @NonNull
+    protected Collection<? extends AbstractModel<?>> transDataList(@NonNull Collection<T> dataList) {
+        List<AbstractModel<?>> dataModels = new ArrayList<>();
+        for (T data : dataList) {
+            dataModels.addAll(transData(data));
+        }
+        return dataModels;
     }
 
-    public <M extends AbstractModel> void addDataModel(@NonNull M model) {
+    @NonNull
+    public final List<T> getDataList() {
+        return dataList;
+    }
+
+    /**
+     * get all models excluding header,footer,loadMore,emptyView
+     */
+    @NonNull
+    public final Collection<? extends AbstractModel<?>> getDataModels() {
+        if (isDataListEmpty()) {
+            return Collections.emptyList();
+        }
+        return getAllModelListBetween(getLastHeader(), getLoadMoreOrFirstFooter());
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Data Models[Add]">
+    private void addDataModels(@NonNull Collection<? extends AbstractModel<?>> dataModels) {
         AbstractModel lastModel = getLoadMoreOrFirstFooter();
         if (lastModel == null) {
-            addModel(model);
+            addModels(dataModels);
         } else {
-            insertModelBefore(model, lastModel);
+            insertModelsBefore(dataModels, lastModel);
         }
     }
 
-    public void addDataModels(@NonNull AbstractModel<?>... modelsToAdd) {
-        addDataModels(Arrays.asList(modelsToAdd), hasMore);
+    public final void addData(@NonNull T data) {
+        addDataModels(transData(data));
+        dataList.add(data);
+
+        checkEmptyView();
     }
 
-    public void addDataModels(@NonNull Collection<? extends AbstractModel<?>> modelsToAdd) {
-        addDataModels(modelsToAdd, hasMore);
+    public final void addDataList(@NonNull T... dataListToAdd) {
+        addDataList(Arrays.asList(dataListToAdd), hasMore);
     }
 
-    public void addDataModels(@NonNull Collection<? extends AbstractModel<?>> modelsToAdd,
-                              boolean hasMore) {
+    public final void addDataList(@NonNull Collection<T> dataListToAdd) {
+        addDataList(dataListToAdd, hasMore);
+    }
+
+    public final void addDataList(@NonNull Collection<T> dataListToAdd, boolean hasMore) {
         setHasMore(hasMore);
-        AbstractModel lastModel = getLoadMoreOrFirstFooter();
-        if (lastModel == null) {
-            addModels(modelsToAdd);
-        } else {
-            insertModelsBefore(modelsToAdd, lastModel);
-        }
-    }
+        addDataModels(transDataList(dataListToAdd));
+        dataList.addAll(dataListToAdd);
 
-    public void updateDataModels(@NonNull Collection<? extends AbstractModel<?>> newDataModels) {
-        updateDataModels(newDataModels, hasMore);
+        checkEmptyView();
     }
+    //</editor-fold>
 
-    public void updateDataModels(@NonNull Collection<? extends AbstractModel<?>> newDataModels,
-                                 boolean hasMore) {
+    //<editor-fold desc="Data Models[Update]">
+
+    /**
+     * derived class can override this logic
+     */
+    protected void replaceAllDataModels() {
         List<AbstractModel<?>> newModels = new ArrayList<>();
         newModels.addAll(headers.values());
-        newModels.addAll(newDataModels);
-        if (hasMore) newModels.add(loadMoreModel);
+        if (isDataListEmpty()) {
+            newModels.add(emptyViewModel);
+        } else {
+            newModels.addAll(transDataList(dataList));
+            if (hasMore) newModels.add(loadMoreModel);
+        }
         newModels.addAll(footers.values());
 
         replaceAllModels(newModels);
+    }
+
+    /**
+     * derived class can override this logic for optimization
+     */
+    public abstract void notifyDataChanged(@NonNull T data);
+
+    public final void updateDataList(@NonNull Collection<T> newDataList) {
+        updateDataList(newDataList, hasMore);
+    }
+
+    public final void updateDataList(@NonNull Collection<T> newDataList, boolean hasMore) {
+        this.hasMore = hasMore;
+        if (!hasMore) {
+            loadMoreModel.setState(AbstractLoadMoreModel.COMPLETE);
+        }
+
+        dataList.clear();
+        dataList.addAll(newDataList);
+
+        replaceAllDataModels();
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Data Models[Delete]">
+
+    /**
+     * derived class can override this logic for optimization
+     */
+    public void removeData(@NonNull T data) {
+        if (dataList.remove(data)) {
+            replaceAllDataModels();
+        }
     }
     //</editor-fold>
 
@@ -144,7 +268,7 @@ public class SimpleListAdapter extends UUniversalAdapter {
             if (footers.size() == 0) {
                 addModels(loadMoreModel);
             } else {
-                insertModelBefore(loadMoreModel, footers.getFirst());
+                insertModelBefore(loadMoreModel, footers.getFirstOrNull());
             }
         } else {
             //hide
@@ -256,11 +380,11 @@ public class SimpleListAdapter extends UUniversalAdapter {
             return values;
         }
 
-        public V getFirst() {
+        public V getFirstOrNull() {
             return orderList.size() == 0 ? null : map.get(orderList.get(0));
         }
 
-        public V getLast() {
+        public V getLastOrNull() {
             return orderList.size() == 0 ? null : map.get(orderList.get(orderList.size() - 1));
         }
 
