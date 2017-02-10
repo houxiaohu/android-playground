@@ -1,7 +1,9 @@
-package info.xudshen.android.playground.recyclerview.adapter2;
+package info.xudshen.android.playground.recyclerview.adapter2.eventhook;
 
 import android.support.annotation.NonNull;
 import android.view.View;
+
+import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter;
 
 import static android.support.v7.widget.RecyclerView.NO_POSITION;
 

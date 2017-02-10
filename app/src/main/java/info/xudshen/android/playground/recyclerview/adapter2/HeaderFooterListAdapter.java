@@ -18,6 +18,9 @@ import info.xudshen.android.playground.R;
 
 /**
  * including header, data, loadMore, footer, emptyView part
+ * <p>
+ * normal order [header, data, loadMore, footer]
+ * empty data set [header, emptyView, footer]
  *
  * @author xudong
  * @since 2017/2/9
@@ -52,6 +55,9 @@ public abstract class HeaderFooterListAdapter<T> extends UUniversalAdapter {
         return headers.values();
     }
 
+    /**
+     * @throws IllegalStateException if headers is corrupted
+     */
     public final <M extends AbstractModel> boolean addHeader(@NonNull M model) {
         if (headers.checkExistAndConsistency(model.id())) {
             return false;
@@ -79,6 +85,9 @@ public abstract class HeaderFooterListAdapter<T> extends UUniversalAdapter {
         return footers.values();
     }
 
+    /**
+     * @throws IllegalStateException if footers is corrupted
+     */
     public final <M extends AbstractModel> boolean addFooter(@NonNull M model) {
         if (footers.checkExistAndConsistency(model.id())) {
             return false;
@@ -146,7 +155,8 @@ public abstract class HeaderFooterListAdapter<T> extends UUniversalAdapter {
     abstract Collection<? extends AbstractModel<?>> transData(@NonNull T data);
 
     @NonNull
-    protected Collection<? extends AbstractModel<?>> transDataList(@NonNull Collection<T> dataList) {
+    protected Collection<? extends AbstractModel<?>> transDataList(
+            @NonNull Collection<T> dataList) {
         List<AbstractModel<?>> dataModels = new ArrayList<>();
         for (T data : dataList) {
             dataModels.addAll(transData(data));
@@ -336,6 +346,9 @@ public abstract class HeaderFooterListAdapter<T> extends UUniversalAdapter {
         private HashMap<K, V> map = new HashMap<>();
         private List<K> orderList = new ArrayList<>();
 
+        /**
+         * @throws IllegalStateException if data is corrupted
+         */
         boolean checkExistAndConsistency(@Nullable K key) {
             boolean inMap = map.containsKey(key),
                     inOrder = orderList.contains(key);

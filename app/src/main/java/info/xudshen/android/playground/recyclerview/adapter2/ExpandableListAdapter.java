@@ -10,8 +10,6 @@ import java.util.Collection;
  */
 
 public class ExpandableListAdapter extends HeaderFooterListAdapter<ExpandableList> {
-    private int dataListSize = 0;
-
     @Override
     protected boolean isDataListEmpty() {
         int size = 0;

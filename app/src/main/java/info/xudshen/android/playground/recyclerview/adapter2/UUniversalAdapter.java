@@ -20,6 +20,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import info.xudshen.android.playground.recyclerview.adapter2.eventhook.EventHook;
+import info.xudshen.android.playground.recyclerview.adapter2.eventhook.EventHookHelper;
+import info.xudshen.android.playground.recyclerview.adapter2.eventhook.OnClickEventHook;
+import info.xudshen.android.playground.recyclerview.adapter2.eventhook.OnLongClickEventHook;
+
 import static android.view.View.NO_ID;
 
 /**

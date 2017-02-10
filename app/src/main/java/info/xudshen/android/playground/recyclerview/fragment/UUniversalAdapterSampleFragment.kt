@@ -11,7 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import info.xudshen.android.playground.R
-import info.xudshen.android.playground.recyclerview.adapter2.OnLongClickEventHook
+import info.xudshen.android.playground.recyclerview.adapter2.eventhook.OnLongClickEventHook
 import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter
 import kotlinx.android.synthetic.main.fragment_uuniversal_adapter_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*

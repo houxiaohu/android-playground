@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import info.xudshen.android.playground.R
 import info.xudshen.android.playground.recyclerview.adapter2.AbstractLoadMoreModel
-import info.xudshen.android.playground.recyclerview.adapter2.USimpleListAdapter
+import info.xudshen.android.playground.recyclerview.adapter2.SimpleListAdapter
 import kotlinx.android.synthetic.main.fragment_simple_list_adapter_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 
@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.include_toolbar.*
  */
 
 class SimpleListAdapterSampleFragment : Fragment() {
-    var adapter = USimpleListAdapter()
+    var adapter = SimpleListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +37,7 @@ class SimpleListAdapterSampleFragment : Fragment() {
         (activity as AppCompatActivity?)?.setSupportActionBar(toolbar)
         (activity as AppCompatActivity?)?.title = "AbstractListAdapter"
 
-        adapter = USimpleListAdapter()
+        adapter = SimpleListAdapter()
         list.layoutManager = LinearLayoutManager(context)
         list.adapter = adapter
 

@@ -1,4 +1,4 @@
-package info.xudshen.android.playground.recyclerview.adapter2;
+package info.xudshen.android.playground.recyclerview.adapter2.eventhook;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,30 +7,32 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter;
+
 /**
  * @author xudong
  * @since 2017/2/6
  */
 
-class EventHookHelper<VH extends UUniversalAdapter.ViewHolder> {
+public class EventHookHelper<VH extends UUniversalAdapter.ViewHolder> {
     private boolean isAfterBind = false;
 
     @NonNull
     private final UUniversalAdapter uUniversalAdapter;
     private final List<EventHook<VH>> eventHooks = new ArrayList<>();
 
-    EventHookHelper(@NonNull UUniversalAdapter uUniversalAdapter) {
+    public EventHookHelper(@NonNull UUniversalAdapter uUniversalAdapter) {
         this.uUniversalAdapter = uUniversalAdapter;
     }
 
-    void add(@NonNull EventHook<VH> eventHook) {
+    public void add(@NonNull EventHook<VH> eventHook) {
         if (isAfterBind) {
             throw new IllegalStateException("can not add event hook after bind");
         }
         eventHooks.add(eventHook);
     }
 
-    void bind(@NonNull UUniversalAdapter.ViewHolder viewHolder) {
+    public void bind(@NonNull UUniversalAdapter.ViewHolder viewHolder) {
         for (final EventHook<VH> eventHook : eventHooks) {
             if (!eventHook.clazz.isInstance(viewHolder)) continue;
             final VH vh = eventHook.clazz.cast(viewHolder);
