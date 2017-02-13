@@ -34,5 +34,6 @@ public class SimpleListAdapter extends HeaderFooterListAdapter<UUniversalAdapter
         if (dataList.remove(data)) {
             removeModel(data);
         }
+        checkEmptyView();
     }
 }

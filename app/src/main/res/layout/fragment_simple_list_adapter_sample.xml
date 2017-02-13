@@ -111,6 +111,22 @@
                     app:layout_columnWeight="1" />
 
                 <Button
+                    android:id="@+id/remove_1data"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="remove one data"
+                    app:layout_columnWeight="1" />
+
+                <Button
+                    android:id="@+id/clear_data"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="clear data"
+                    app:layout_columnWeight="1" />
+
+                <Button
                     android:id="@+id/remove_header"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

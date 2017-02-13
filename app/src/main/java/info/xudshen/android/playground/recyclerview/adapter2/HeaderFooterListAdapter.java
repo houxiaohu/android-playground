@@ -136,7 +136,7 @@ public abstract class HeaderFooterListAdapter<T> extends UUniversalAdapter {
      */
     protected void checkEmptyView() {
         if (isDataListEmpty()) {
-            if (emptyViewModel != null && containsModel(emptyViewModel)) {
+            if (emptyViewModel != null && !containsModel(emptyViewModel)) {
                 addModel(headers.size(), emptyViewModel);
             }
         } else {
@@ -257,6 +257,13 @@ public abstract class HeaderFooterListAdapter<T> extends UUniversalAdapter {
     //</editor-fold>
 
     //<editor-fold desc="Data Models[Delete]">
+    public void clearData(boolean hasMore) {
+        updateDataList(Collections.<T>emptyList(), hasMore);
+    }
+
+    public void clearData() {
+        clearData(hasMore);
+    }
 
     /**
      * derived class can override this logic for optimization

@@ -11,6 +11,7 @@ import android.widget.Toast
 import info.xudshen.android.playground.R
 import info.xudshen.android.playground.recyclerview.adapter2.AbstractLoadMoreModel
 import info.xudshen.android.playground.recyclerview.adapter2.SimpleListAdapter
+import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter
 import kotlinx.android.synthetic.main.fragment_simple_list_adapter_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 
@@ -41,6 +42,8 @@ class SimpleListAdapterSampleFragment : Fragment() {
         list.layoutManager = LinearLayoutManager(context)
         list.adapter = adapter
 
+        adapter.setEmptyViewModel(EmptyViewModel())
+
         var headerCount = 100001
         var footerCount = 200001
         var dataCount = 0
@@ -70,6 +73,15 @@ class SimpleListAdapterSampleFragment : Fragment() {
             }, hasMore)
             adapter.setLoadMoreState(loadMoreState)
             dataCount += 4
+        }
+        remove_1data.setOnClickListener {
+            val model = adapter.dataModels.firstOrNull()
+            model?.let {
+                adapter.removeData(model)
+            }
+        }
+        clear_data.setOnClickListener {
+            adapter.clearData()
         }
         remove_header.setOnClickListener {
             adapter.headers.firstOrNull()?.let {
@@ -126,5 +138,14 @@ class SimpleListAdapterSampleFragment : Fragment() {
         load_start.setOnClickListener { checkLoadMoreState(it) }
         load_complete.setOnClickListener { checkLoadMoreState(it) }
         load_failed.setOnClickListener { checkLoadMoreState(it) }
+    }
+
+    class EmptyViewModel : UUniversalAdapter.AbstractModel<EmptyViewModel.ViewHolder>() {
+        override fun getLayoutRes(): Int = R.layout.layout_empty_view_item
+
+        override fun getViewHolderCreator(): UUniversalAdapter.IViewHolderCreator<ViewHolder> =
+                UUniversalAdapter.IViewHolderCreator { ViewHolder(it) }
+
+        class ViewHolder(itemView: View) : UUniversalAdapter.ViewHolder(itemView)
     }
 }
