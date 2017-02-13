@@ -28,6 +28,16 @@ public class ExpandableList {
         this.emptyViewModel = emptyViewModel;
     }
 
+    @Nullable
+    public UUniversalAdapter.AbstractModel getHeaderModel() {
+        return headerModel;
+    }
+
+    @Nullable
+    public UUniversalAdapter.AbstractModel getEmptyViewModel() {
+        return emptyViewModel;
+    }
+
     @NonNull
     public List<UUniversalAdapter.AbstractModel<?>> getChildModels() {
         return childModels;
