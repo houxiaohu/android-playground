@@ -3,7 +3,7 @@ package info.xudshen.android.playground.recyclerview.adapter2.eventhook;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter;
+import info.xudshen.android.playground.recyclerview.adapter2.UniversalAdapter;
 
 import static android.support.v7.widget.RecyclerView.NO_POSITION;
 
@@ -12,23 +12,23 @@ import static android.support.v7.widget.RecyclerView.NO_POSITION;
  * @since 2017/2/8
  */
 
-public abstract class OnLongClickEventHook<VH extends UUniversalAdapter.ViewHolder> extends
+public abstract class OnLongClickEventHook<VH extends UniversalAdapter.ViewHolder> extends
         EventHook<VH> {
     public OnLongClickEventHook(@NonNull Class<VH> clazz) {
         super(clazz);
     }
 
     public abstract boolean onLongClick(@NonNull View view, @NonNull VH viewHolder, int position,
-                                        @NonNull UUniversalAdapter.AbstractModel rawModel);
+                                        @NonNull UniversalAdapter.AbstractModel rawModel);
 
     @Override
     public void onEvent(@NonNull View view, @NonNull final VH viewHolder,
-                        @NonNull final UUniversalAdapter adapter) {
+                        @NonNull final UniversalAdapter adapter) {
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 int position = viewHolder.getAdapterPosition();
-                UUniversalAdapter.AbstractModel rawModel = adapter.getModel(position);
+                UniversalAdapter.AbstractModel rawModel = adapter.getModel(position);
                 return position != NO_POSITION && rawModel != null
                         && OnLongClickEventHook.this.onLongClick(v, viewHolder, position, rawModel);
             }

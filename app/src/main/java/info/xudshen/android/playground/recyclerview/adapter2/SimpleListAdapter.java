@@ -10,7 +10,7 @@ import java.util.Collections;
  * @since 2017/2/10
  */
 
-public class SimpleListAdapter extends HeaderFooterListAdapter<UUniversalAdapter.AbstractModel<?>> {
+public class SimpleListAdapter extends HeaderFooterListAdapter<UniversalAdapter.AbstractModel<?>> {
     @NonNull
     @Override
     Collection<? extends AbstractModel<?>> transData(@NonNull AbstractModel<?> data) {

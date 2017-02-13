@@ -6,14 +6,14 @@ import android.view.View;
 
 import java.util.List;
 
-import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter;
+import info.xudshen.android.playground.recyclerview.adapter2.UniversalAdapter;
 
 /**
  * @author xudong
  * @since 2017/2/6
  */
 
-public abstract class EventHook<VH extends UUniversalAdapter.ViewHolder> {
+public abstract class EventHook<VH extends UniversalAdapter.ViewHolder> {
     @NonNull
     final Class<VH> clazz;
 
@@ -22,7 +22,7 @@ public abstract class EventHook<VH extends UUniversalAdapter.ViewHolder> {
     }
 
     public abstract void onEvent(@NonNull View view, @NonNull VH viewHolder,
-                                 @NonNull UUniversalAdapter adapter);
+                                 @NonNull UniversalAdapter adapter);
 
     @Nullable
     public View onBind(@NonNull VH viewHolder) {

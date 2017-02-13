@@ -12,7 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import info.xudshen.android.playground.R
 import info.xudshen.android.playground.recyclerview.adapter2.eventhook.OnLongClickEventHook
-import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter
+import info.xudshen.android.playground.recyclerview.adapter2.UniversalAdapter
 import kotlinx.android.synthetic.main.fragment_uuniversal_adapter_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.layout_horizontal_list_item.view.*
@@ -27,7 +27,7 @@ import java.util.*
 
 class UUniversalAdapterSampleFragment : Fragment() {
     //not right, just for no more error
-    var adapter: UUniversalAdapter = UUniversalAdapter()
+    var adapter: UniversalAdapter = UniversalAdapter()
 
     val add1Btn = ButtonModel("add 1")
     val add10Btn = ButtonModel("add 10")
@@ -51,9 +51,9 @@ class UUniversalAdapterSampleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as AppCompatActivity?)?.setSupportActionBar(toolbar)
-        (activity as AppCompatActivity?)?.title = "UUniversalAdapter"
+        (activity as AppCompatActivity?)?.title = "UniversalAdapter"
 
-        adapter = UUniversalAdapter()
+        adapter = UniversalAdapter()
         adapter.setSpanCount(4)
         list.layoutManager = GridLayoutManager(context, 4)
         (list.layoutManager as GridLayoutManager).spanSizeLookup = adapter.spanSizeLookup
@@ -73,7 +73,7 @@ class UUniversalAdapterSampleFragment : Fragment() {
         var insertId = 10000
 
         adapter.addEventHook(object : OnLongClickEventHook<ButtonModel.ViewHolder>(ButtonModel.ViewHolder::class.java) {
-            override fun onLongClick(view: View, viewHolder: ButtonModel.ViewHolder, position: Int, rawModel: UUniversalAdapter.AbstractModel<*>): Boolean {
+            override fun onLongClick(view: View, viewHolder: ButtonModel.ViewHolder, position: Int, rawModel: UniversalAdapter.AbstractModel<*>): Boolean {
                 if (rawModel is ButtonModel) {
                     if (rawModel === add1Btn) {
                         adapter.addModel(TextModel(adapter.itemCount - btnList.size))
@@ -137,11 +137,11 @@ class UUniversalAdapterSampleFragment : Fragment() {
         adapter.onRestoreInstanceState(savedInstanceState)
     }
 
-    class ButtonModel(var title: String) : UUniversalAdapter.AbstractModel<ButtonModel.ViewHolder>() {
+    class ButtonModel(var title: String) : UniversalAdapter.AbstractModel<ButtonModel.ViewHolder>() {
         override fun getLayoutRes(): Int = R.layout.layout_button_item
 
-        override fun getViewHolderCreator(): UUniversalAdapter.IViewHolderCreator<ViewHolder> =
-                UUniversalAdapter.IViewHolderCreator { view -> ViewHolder(view) }
+        override fun getViewHolderCreator(): UniversalAdapter.IViewHolderCreator<ViewHolder> =
+                UniversalAdapter.IViewHolderCreator { view -> ViewHolder(view) }
 
         override fun bindData(holder: ViewHolder) {
             holder.itemView.section_title.text = title
@@ -149,15 +149,15 @@ class UUniversalAdapterSampleFragment : Fragment() {
 
         override fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int = 2
 
-        class ViewHolder(itemView: View) : UUniversalAdapter.ViewHolder(itemView)
+        class ViewHolder(itemView: View) : UniversalAdapter.ViewHolder(itemView)
     }
 
 
-    class TextModel(val index: Int, var clicked: Boolean = false) : UUniversalAdapter.AbstractModel<TextModel.ViewHolder>() {
+    class TextModel(val index: Int, var clicked: Boolean = false) : UniversalAdapter.AbstractModel<TextModel.ViewHolder>() {
         override fun getLayoutRes(): Int = R.layout.layout_text_item
 
-        override fun getViewHolderCreator(): UUniversalAdapter.IViewHolderCreator<ViewHolder> =
-                UUniversalAdapter.IViewHolderCreator { view -> ViewHolder(view) }
+        override fun getViewHolderCreator(): UniversalAdapter.IViewHolderCreator<ViewHolder> =
+                UniversalAdapter.IViewHolderCreator { view -> ViewHolder(view) }
 
         override fun bindData(holder: ViewHolder) {
             holder.itemView.section_title.text = if (clicked) "$index clicked" else "$index"
@@ -173,16 +173,16 @@ class UUniversalAdapterSampleFragment : Fragment() {
 
         override fun id(): Long = index.toLong()
 
-        override fun isItemTheSame(item: UUniversalAdapter.AbstractModel<*>): Boolean
+        override fun isItemTheSame(item: UniversalAdapter.AbstractModel<*>): Boolean
                 = item is TextModel && index == item.index
 
-        override fun isContentTheSame(item: UUniversalAdapter.AbstractModel<*>): Boolean
+        override fun isContentTheSame(item: UniversalAdapter.AbstractModel<*>): Boolean
                 = item is TextModel && clicked == item.clicked
 
-        class ViewHolder(itemView: View) : UUniversalAdapter.ViewHolder(itemView)
+        class ViewHolder(itemView: View) : UniversalAdapter.ViewHolder(itemView)
     }
 
-    class HorizontalListModel(id: Long) : UUniversalAdapter.AbstractModel<HorizontalListModel.ViewHolder>(id) {
+    class HorizontalListModel(id: Long) : UniversalAdapter.AbstractModel<HorizontalListModel.ViewHolder>(id) {
 
         override fun getLayoutRes(): Int = R.layout.layout_horizontal_list_item
 
@@ -194,10 +194,10 @@ class UUniversalAdapterSampleFragment : Fragment() {
 
         override fun getSpanSize(totalSpanCount: Int, position: Int, itemCount: Int): Int = totalSpanCount
 
-        override fun getViewHolderCreator(): UUniversalAdapter.IViewHolderCreator<ViewHolder> =
-                UUniversalAdapter.IViewHolderCreator { ViewHolder(it) }
+        override fun getViewHolderCreator(): UniversalAdapter.IViewHolderCreator<ViewHolder> =
+                UniversalAdapter.IViewHolderCreator { ViewHolder(it) }
 
-        class ViewHolder(itemView: View) : UUniversalAdapter.ViewHolder(itemView) {
+        class ViewHolder(itemView: View) : UniversalAdapter.ViewHolder(itemView) {
             init {
                 itemView.rv.layoutManager = LinearLayoutManager(itemView.context, OrientationHelper.HORIZONTAL, false)
                 itemView.rv.adapter = HAdapter(0)

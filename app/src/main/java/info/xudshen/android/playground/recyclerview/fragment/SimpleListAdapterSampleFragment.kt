@@ -11,7 +11,7 @@ import android.widget.Toast
 import info.xudshen.android.playground.R
 import info.xudshen.android.playground.recyclerview.adapter2.AbstractLoadMoreModel
 import info.xudshen.android.playground.recyclerview.adapter2.SimpleListAdapter
-import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter
+import info.xudshen.android.playground.recyclerview.adapter2.UniversalAdapter
 import kotlinx.android.synthetic.main.fragment_simple_list_adapter_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 
@@ -140,12 +140,12 @@ class SimpleListAdapterSampleFragment : Fragment() {
         load_failed.setOnClickListener { checkLoadMoreState(it) }
     }
 
-    class EmptyViewModel : UUniversalAdapter.AbstractModel<EmptyViewModel.ViewHolder>() {
+    class EmptyViewModel : UniversalAdapter.AbstractModel<EmptyViewModel.ViewHolder>() {
         override fun getLayoutRes(): Int = R.layout.layout_empty_view_item
 
-        override fun getViewHolderCreator(): UUniversalAdapter.IViewHolderCreator<ViewHolder> =
-                UUniversalAdapter.IViewHolderCreator { ViewHolder(it) }
+        override fun getViewHolderCreator(): UniversalAdapter.IViewHolderCreator<ViewHolder> =
+                UniversalAdapter.IViewHolderCreator { ViewHolder(it) }
 
-        class ViewHolder(itemView: View) : UUniversalAdapter.ViewHolder(itemView)
+        class ViewHolder(itemView: View) : UniversalAdapter.ViewHolder(itemView)
     }
 }

@@ -7,14 +7,14 @@ import android.widget.TextView;
 
 import info.xudshen.android.playground.R;
 import info.xudshen.android.playground.model.SampleItemModel;
-import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter;
+import info.xudshen.android.playground.recyclerview.adapter2.UniversalAdapter;
 
 /**
  * @author xudong
  * @since 2017/2/6
  */
 
-public class USampleItemModel extends UUniversalAdapter.AbstractModel<USampleItemModel.ViewHolder> {
+public class USampleItemModel extends UniversalAdapter.AbstractModel<USampleItemModel.ViewHolder> {
     @NonNull
     private final SampleItemModel data;
 
@@ -36,8 +36,8 @@ public class USampleItemModel extends UUniversalAdapter.AbstractModel<USampleIte
 
     @NonNull
     @Override
-    public UUniversalAdapter.IViewHolderCreator<ViewHolder> getViewHolderCreator() {
-        return new UUniversalAdapter.IViewHolderCreator<ViewHolder>() {
+    public UniversalAdapter.IViewHolderCreator<ViewHolder> getViewHolderCreator() {
+        return new UniversalAdapter.IViewHolderCreator<ViewHolder>() {
             @NonNull
             @Override
             public ViewHolder create(@NonNull View view) {
@@ -46,7 +46,7 @@ public class USampleItemModel extends UUniversalAdapter.AbstractModel<USampleIte
         };
     }
 
-    public static class ViewHolder extends UUniversalAdapter.ViewHolder {
+    public static class ViewHolder extends UniversalAdapter.ViewHolder {
         private TextView title;
 
         public ViewHolder(View itemView) {

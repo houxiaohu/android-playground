@@ -14,32 +14,32 @@ import java.util.List;
 
 public class ExpandableList {
     @Nullable
-    private final UUniversalAdapter.AbstractModel headerModel, emptyViewModel;
+    private final UniversalAdapter.AbstractModel headerModel, emptyViewModel;
     @NonNull
-    private final List<UUniversalAdapter.AbstractModel<?>> childModels = new ArrayList<>();
+    private final List<UniversalAdapter.AbstractModel<?>> childModels = new ArrayList<>();
 
-    public ExpandableList(@Nullable UUniversalAdapter.AbstractModel headerModel) {
+    public ExpandableList(@Nullable UniversalAdapter.AbstractModel headerModel) {
         this(headerModel, null);
     }
 
-    public ExpandableList(@Nullable UUniversalAdapter.AbstractModel headerModel,
-                          @Nullable UUniversalAdapter.AbstractModel emptyViewModel) {
+    public ExpandableList(@Nullable UniversalAdapter.AbstractModel headerModel,
+                          @Nullable UniversalAdapter.AbstractModel emptyViewModel) {
         this.headerModel = headerModel;
         this.emptyViewModel = emptyViewModel;
     }
 
     @Nullable
-    public UUniversalAdapter.AbstractModel getHeaderModel() {
+    public UniversalAdapter.AbstractModel getHeaderModel() {
         return headerModel;
     }
 
     @Nullable
-    public UUniversalAdapter.AbstractModel getEmptyViewModel() {
+    public UniversalAdapter.AbstractModel getEmptyViewModel() {
         return emptyViewModel;
     }
 
     @NonNull
-    public List<UUniversalAdapter.AbstractModel<?>> getChildModels() {
+    public List<UniversalAdapter.AbstractModel<?>> getChildModels() {
         return childModels;
     }
 
@@ -59,8 +59,8 @@ public class ExpandableList {
     }
 
     @NonNull
-    public Collection<? extends UUniversalAdapter.AbstractModel<?>> flatten() {
-        List<UUniversalAdapter.AbstractModel<?>> all = new ArrayList<>();
+    public Collection<? extends UniversalAdapter.AbstractModel<?>> flatten() {
+        List<UniversalAdapter.AbstractModel<?>> all = new ArrayList<>();
         if (headerModel != null) {
             all.add(headerModel);
         }

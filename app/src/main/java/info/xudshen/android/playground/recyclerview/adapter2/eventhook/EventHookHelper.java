@@ -7,22 +7,22 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-import info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter;
+import info.xudshen.android.playground.recyclerview.adapter2.UniversalAdapter;
 
 /**
  * @author xudong
  * @since 2017/2/6
  */
 
-public class EventHookHelper<VH extends UUniversalAdapter.ViewHolder> {
+public class EventHookHelper<VH extends UniversalAdapter.ViewHolder> {
     private boolean isAfterBind = false;
 
     @NonNull
-    private final UUniversalAdapter uUniversalAdapter;
+    private final UniversalAdapter universalAdapter;
     private final List<EventHook<VH>> eventHooks = new ArrayList<>();
 
-    public EventHookHelper(@NonNull UUniversalAdapter uUniversalAdapter) {
-        this.uUniversalAdapter = uUniversalAdapter;
+    public EventHookHelper(@NonNull UniversalAdapter universalAdapter) {
+        this.universalAdapter = universalAdapter;
     }
 
     public void add(@NonNull EventHook<VH> eventHook) {
@@ -32,7 +32,7 @@ public class EventHookHelper<VH extends UUniversalAdapter.ViewHolder> {
         eventHooks.add(eventHook);
     }
 
-    public void bind(@NonNull UUniversalAdapter.ViewHolder viewHolder) {
+    public void bind(@NonNull UniversalAdapter.ViewHolder viewHolder) {
         for (final EventHook<VH> eventHook : eventHooks) {
             if (!eventHook.clazz.isInstance(viewHolder)) continue;
             final VH vh = eventHook.clazz.cast(viewHolder);
@@ -57,7 +57,7 @@ public class EventHookHelper<VH extends UUniversalAdapter.ViewHolder> {
     private void attachToView(@NonNull EventHook<VH> eventHook, @NonNull VH viewHolder,
                               @Nullable View view) {
         if (view == null) return;
-        eventHook.onEvent(view, viewHolder, uUniversalAdapter);
+        eventHook.onEvent(view, viewHolder, universalAdapter);
 
         //set true once having one success bind
         isAfterBind = true;

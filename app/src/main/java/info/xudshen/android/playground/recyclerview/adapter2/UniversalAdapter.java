@@ -32,8 +32,8 @@ import static android.view.View.NO_ID;
  * @since 2017/2/6
  */
 
-public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.ViewHolder> {
-    private static final String LOG_TAG = UUniversalAdapter.class.getSimpleName();
+public class UniversalAdapter extends RecyclerView.Adapter<UniversalAdapter.ViewHolder> {
+    private static final String LOG_TAG = UniversalAdapter.class.getSimpleName();
     private static final String SAVED_STATE_ARG_VIEW_HOLDERS = "saved_state_view_holders";
 
     private final ModelList models = new ModelList();
@@ -65,7 +65,7 @@ public class UUniversalAdapter extends RecyclerView.Adapter<UUniversalAdapter.Vi
     }
     //</editor-fold>
 
-    public UUniversalAdapter() {
+    public UniversalAdapter() {
         setHasStableIds(true);
         spanSizeLookup.setSpanIndexCacheEnabled(true);
     }

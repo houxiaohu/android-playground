@@ -23,7 +23,7 @@ class ViewHolderState extends LongSparseArray<ViewHolderState.ViewState> impleme
         super(initialCapacity);
     }
 
-    public void save(UUniversalAdapter.ViewHolder holder) {
+    public void save(UniversalAdapter.ViewHolder holder) {
         if (!holder.shouldSaveViewState()) return;
 
         ViewState state = get(holder.getItemId());
@@ -34,7 +34,7 @@ class ViewHolderState extends LongSparseArray<ViewHolderState.ViewState> impleme
         put(holder.getItemId(), state);
     }
 
-    public void restore(UUniversalAdapter.ViewHolder holder) {
+    public void restore(UniversalAdapter.ViewHolder holder) {
         if (!holder.shouldSaveViewState()) return;
 
         ViewState state = get(holder.getItemId());

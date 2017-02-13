@@ -25,7 +25,7 @@ import info.xudshen.android.playground.R;
  * @author xudong
  * @since 2017/2/9
  */
-public abstract class HeaderFooterListAdapter<T> extends UUniversalAdapter {
+public abstract class HeaderFooterListAdapter<T> extends UniversalAdapter {
     @NonNull
     private final OrderedMap<Long, AbstractModel<?>> headers = new OrderedMap<>(),
             footers = new OrderedMap<>();
@@ -149,7 +149,7 @@ public abstract class HeaderFooterListAdapter<T> extends UUniversalAdapter {
 
     /**
      * convert {@link T} data to
-     * {@link info.xudshen.android.playground.recyclerview.adapter2.UUniversalAdapter.AbstractModel}
+     * {@link UniversalAdapter.AbstractModel}
      */
     @NonNull
     abstract Collection<? extends AbstractModel<?>> transData(@NonNull T data);
@@ -339,7 +339,7 @@ public abstract class HeaderFooterListAdapter<T> extends UUniversalAdapter {
             };
         }
 
-        public class ViewHolder extends UUniversalAdapter.ViewHolder {
+        public class ViewHolder extends UniversalAdapter.ViewHolder {
             private TextView title;
 
             public ViewHolder(View itemView) {

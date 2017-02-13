@@ -11,8 +11,8 @@ import java.lang.annotation.RetentionPolicy;
  * @author xudong
  * @since 2017/2/9
  */
-public abstract class AbstractLoadMoreModel<VH extends UUniversalAdapter.ViewHolder> extends
-        UUniversalAdapter.AbstractModel<VH> {
+public abstract class AbstractLoadMoreModel<VH extends UniversalAdapter.ViewHolder> extends
+        UniversalAdapter.AbstractModel<VH> {
     public static final int START = 0;
     public static final int COMPLETE = 1;
     public static final int FAILED = 2;
