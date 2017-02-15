@@ -223,7 +223,7 @@ public abstract class HeaderFooterListAdapter<T> extends UniversalAdapter {
     protected void replaceAllDataModels() {
         List<AbstractModel<?>> newModels = new ArrayList<>();
         newModels.addAll(headers.values());
-        if (isDataListEmpty()) {
+        if (isDataListEmpty() && emptyViewModel != null) {
             newModels.add(emptyViewModel);
         } else {
             newModels.addAll(transDataList(dataList));
