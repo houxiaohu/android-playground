@@ -18,8 +18,8 @@ class SvgSampleFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_svg_sample, container, false)
-        animImageView = view?.findViewById(R.id.anim_iv) as ImageView
-        view?.findViewById(R.id.anim_trigger)?.setOnClickListener {
+        animImageView = view?.findViewById<ImageView>(R.id.anim_iv) as ImageView
+        view?.findViewById<View>(R.id.anim_trigger)?.setOnClickListener {
             (animImageView?.background as Animatable).start()
         }
         return view

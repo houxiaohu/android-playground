@@ -30,7 +30,7 @@ class SimpleUniversalAdapter : UniversalAdapter() {
         class SampleItemModelViewHolder : IModelViewHolder {
             var title: TextView? = null
             override fun bindView(itemView: View) {
-                title = itemView.findViewById(R.id.section_title) as TextView
+                title = itemView.findViewById(R.id.section_title)
             }
         }
     }
