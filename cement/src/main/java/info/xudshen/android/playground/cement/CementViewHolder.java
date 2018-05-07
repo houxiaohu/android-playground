@@ -10,13 +10,22 @@ import java.util.List;
 public class CementViewHolder extends RecyclerView.ViewHolder {
     @Nullable
     CementModel model;
+    boolean supportPropertyStage = false;
 
     public CementViewHolder(View itemView) {
         super(itemView);
     }
 
     void bind(@NonNull CementModel model, @Nullable List<Object> payloads) {
-        if (payloads != null && !payloads.isEmpty()) {
+        if (supportPropertyStage) {
+            //only start stage property after first bind
+            model.shouldStageProperty(true);
+        }
+        if (model.isPropertiesChanged()) {
+            // noinspection unchecked
+            model.bindPartialData(this);
+            model.doPropertiesCleanUp();
+        } else if (payloads != null && !payloads.isEmpty()) {
             // noinspection unchecked
             model.bindData(this, payloads);
         } else {
@@ -29,6 +38,14 @@ public class CementViewHolder extends RecyclerView.ViewHolder {
 
     void unbind() {
         if (model == null) return;
+
+        if (supportPropertyStage) {
+            //disable stage property after unbind
+            model.shouldStageProperty(false);
+        }
+        if (model.isPropertiesChanged()) {
+            model.doPropertiesCleanUp();
+        }
         // noinspection unchecked
         model.unbind(this);
         model = null;

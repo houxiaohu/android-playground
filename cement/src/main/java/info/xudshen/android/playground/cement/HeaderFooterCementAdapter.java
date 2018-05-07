@@ -255,12 +255,20 @@ public abstract class HeaderFooterCementAdapter<T> extends CementAdapter {
         updateDataList(newDataList, hasMore);
     }
 
+    private void batchDoPropertiesStage(@NonNull Collection<T> oldDataList,
+                                        @NonNull Collection<T> newDataList) {
+        if (oldDataList.isEmpty() || newDataList.isEmpty()) return;
+    }
+
     public final void updateDataList(@NonNull Collection<T> newDataList, boolean hasMore) {
         this.hasMore = hasMore;
         if (!hasMore) {
             loadMoreModel.setState(CementLoadMoreModel.COMPLETE);
         }
 
+        if (supportPropertyStage) {
+            batchDoPropertiesStage(dataList, newDataList);
+        }
         dataList.clear();
         dataList.addAll(newDataList);
 

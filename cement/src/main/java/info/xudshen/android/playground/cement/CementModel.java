@@ -19,17 +19,19 @@ import static android.view.View.NO_ID;
  * otherwise may cause the {@link DiffUtil#calculateDiff(DiffUtil.Callback)} failed,
  * even "Inconsistency detected" exception
  */
-public abstract class CementModel<T extends CementViewHolder>
-        implements IDiffUtilHelper<CementModel<?>> {
+public abstract class CementModel<T extends CementViewHolder> {
     private static long idCounter = NO_ID - 1;
     /**
      * used to unique identify a model in the RecyclerView,
      * see {@link CementAdapter#getItemId(int)}
      * <p>
      * can be written by {@link #CementModel(long)} or override by {@link #id()}
-     * TODO: not allow change once set
      */
     private long id;
+
+    private boolean afterModelBuild = false;
+
+    private boolean shouldStageProperty = false;
 
     protected CementModel(long id) {
         this.id = id;
@@ -45,6 +47,10 @@ public abstract class CementModel<T extends CementViewHolder>
      */
     public final long id() {
         return id;
+    }
+
+    protected void setAfterModelBuild() {
+        afterModelBuild = true;
     }
 
     /**
@@ -74,6 +80,32 @@ public abstract class CementModel<T extends CementViewHolder>
         return hashInt(getLayoutRes());
     }
 
+    protected boolean shouldStageProperty() {
+        return shouldStageProperty;
+    }
+
+    void shouldStageProperty(boolean shouldStageProperty) {
+        this.shouldStageProperty = shouldStageProperty;
+    }
+
+    /**
+     * Whether data is changed
+     */
+    public boolean isPropertiesChanged() {
+        return false;
+    }
+
+    /**
+     * Clean up the old data
+     */
+    public void doPropertiesCleanUp() {
+        //do nothing.
+    }
+
+    public void doPropertiesStage(@NonNull CementModel model) {
+        //do nothing.
+    }
+
     /**
      * Binds the data to the viewHolder.
      */
@@ -88,6 +120,13 @@ public abstract class CementModel<T extends CementViewHolder>
      * @see RecyclerView.Adapter#notifyItemChanged(int, Object)
      */
     public void bindData(@NonNull T holder, @Nullable List<Object> payloads) {
+        bindData(holder);
+    }
+
+    /**
+     * Binds the data to the viewHolder with new property values.
+     */
+    public void bindPartialData(@NonNull T holder) {
         bindData(holder);
     }
 
@@ -129,19 +168,6 @@ public abstract class CementModel<T extends CementViewHolder>
     public abstract CementAdapter.IViewHolderCreator<T> getViewHolderCreator();
 
     /**
-     * Called to compare this model with another model, normally just compare the {@link #id()}.
-     *
-     * @param item another model to be compared.
-     *             can be safely cast to the same class of this model
-     * @return True if the two models represent the same object or false if they are different.
-     * @see DiffUtil.Callback#areItemsTheSame(int, int)
-     */
-    @Override
-    public boolean isItemTheSame(@NonNull CementModel<?> item) {
-        return id() == item.id();
-    }
-
-    /**
      * Called to compare this model with another model.
      *
      * @param item another model to be compared.
@@ -149,12 +175,39 @@ public abstract class CementModel<T extends CementViewHolder>
      * @return True if the contents of the models are the same or false if they are different.
      * @see DiffUtil.Callback#areContentsTheSame(int, int)
      */
-    @Override
     public boolean isContentTheSame(@NonNull CementModel<?> item) {
         return true;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CementModel)) {
+            return false;
+        }
+
+        CementModel<?> that = (CementModel<?>) o;
+
+        if (id != that.id) {
+            return false;
+        }
+        return getViewType() == that.getViewType();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + getViewType();
+        return result;
+    }
+
     protected void id(long id) {
+        if (afterModelBuild) {
+            throw new IllegalStateException("Cannot change a model's id " +
+                    "after it has been built");
+        }
         if (id == -1) return;
         this.id = id;
     }
@@ -231,14 +284,14 @@ public abstract class CementModel<T extends CementViewHolder>
      * <p>
      * http://www.javamex.com/tutorials/random_numbers/xorshift.shtml
      */
-    private static long hashLong64Bit(long value) {
+    protected static long hashLong64Bit(long value) {
         value ^= (value << 21);
         value ^= (value >>> 35);
         value ^= (value << 4);
         return value;
     }
 
-    private static int hashInt(int value) {
+    protected static int hashInt(int value) {
         value ^= (value << 13);
         value ^= (value >>> 17);
         value ^= (value << 5);
@@ -254,7 +307,7 @@ public abstract class CementModel<T extends CementViewHolder>
      * <p>
      * Hash implementation from http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-1a
      */
-    private static long hashString64Bit(@NonNull CharSequence str) {
+    protected static long hashString64Bit(@NonNull CharSequence str) {
         long result = 0xcbf29ce484222325L;
         final int len = str.length();
         for (int i = 0; i < len; i++) {
@@ -262,5 +315,13 @@ public abstract class CementModel<T extends CementViewHolder>
             result *= 0x100000001b3L;
         }
         return result;
+    }
+
+    protected static int hashCode(@Nullable Object obj) {
+        return obj == null ? 0 : obj.hashCode();
+    }
+
+    protected static boolean equals(@Nullable Object objA, @Nullable Object objB) {
+        return objA == objB || (objA != null && objA.equals(objB));
     }
 }

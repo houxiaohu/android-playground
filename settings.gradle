@@ -1,1 +1,1 @@
-include ':app', ':cement'
+include ':app', ':cement', ':cement-annotations', ':cement-processor'

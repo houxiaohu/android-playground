@@ -171,8 +171,6 @@ class CementAdapterSampleFragment : Fragment() {
             holder.itemView.input.setText("")
         }
 
-        override fun isItemTheSame(item: CementModel<*>): Boolean = item is TextModel && index == item.index
-
         override fun isContentTheSame(item: CementModel<*>): Boolean = item is TextModel && clicked == item.clicked
 
         class ViewHolder(itemView: View) : CementViewHolder(itemView)

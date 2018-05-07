@@ -67,12 +67,6 @@ public abstract class CementWrapperModel<VH extends CementWrapperViewHolder<MVH>
     public abstract CementAdapter.WrapperViewHolderCreator<VH, MVH> getViewHolderCreator();
 
     @Override
-    public boolean isItemTheSame(@NonNull CementModel<?> item) {
-        return super.isItemTheSame(item)
-                && childModel.isItemTheSame(((CementWrapperModel) item).childModel);
-    }
-
-    @Override
     public boolean isContentTheSame(@NonNull CementModel<?> item) {
         return super.isContentTheSame(item)
                 && childModel.isContentTheSame(((CementWrapperModel) item).childModel);

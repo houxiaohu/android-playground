@@ -33,7 +33,6 @@ import static android.view.View.NO_ID;
  * @author xudong
  * @since 2017/2/6
  */
-
 public class CementAdapter extends RecyclerView.Adapter<CementViewHolder> {
     private static final String LOG_TAG = CementAdapter.class.getSimpleName();
     private static final String SAVED_STATE_ARG_VIEW_HOLDERS = "saved_state_view_holders";
@@ -42,6 +41,8 @@ public class CementAdapter extends RecyclerView.Adapter<CementViewHolder> {
 
     private final EventHookHelper eventHookHelper = new EventHookHelper(this);
     private boolean isAttached = false;
+
+    protected boolean supportPropertyStage = false;
 
     private final LongSparseArray<CementViewHolder> boundViewHolders = new LongSparseArray<>();
     private ViewHolderState viewHolderState = new ViewHolderState();
@@ -70,6 +71,13 @@ public class CementAdapter extends RecyclerView.Adapter<CementViewHolder> {
     public CementAdapter() {
         setHasStableIds(true);
         spanSizeLookup.setSpanIndexCacheEnabled(true);
+    }
+
+    public void setSupportPropertyStage(boolean supportPropertyStage) {
+        if (isAttached) {
+            Log.w(LOG_TAG, "setSupportPropertyStage is called after adapter attached");
+        }
+        this.supportPropertyStage = supportPropertyStage;
     }
 
     //<editor-fold desc="CRUD Method">
@@ -249,16 +257,23 @@ public class CementAdapter extends RecyclerView.Adapter<CementViewHolder> {
                             newModel = getOrNull(modelsToReplace, newItemPosition);
                     return oldModel != null && newModel != null
                             && oldModel.getClass().equals(newModel.getClass())
-                            && oldModel.isItemTheSame(newModel);
+                            && oldModel.id() == newModel.id();
                 }
 
                 @Override
                 public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
                     CementModel<?> oldModel = getOrNull(models, oldItemPosition),
                             newModel = getOrNull(modelsToReplace, newItemPosition);
-                    return oldModel != null && newModel != null
-                            && oldModel.getClass().equals(newModel.getClass())
-                            && oldModel.isContentTheSame(newModel);
+                    if (oldModel != null && newModel != null
+                            && oldModel.getClass().equals(newModel.getClass())) {
+                        //todo: also compare A=A & !A.propertiesChanged
+                        if (oldModel.isContentTheSame(newModel)) {
+                            return true;
+                        } else if (supportPropertyStage) {
+                            newModel.doPropertiesStage(oldModel);
+                        }
+                    }
+                    return false;
                 }
             });
             models.clear();
@@ -272,6 +287,9 @@ public class CementAdapter extends RecyclerView.Adapter<CementViewHolder> {
         int targetIndex = models.indexOf(modelOrigin);
         if (targetIndex == -1) return;
 
+        if (supportPropertyStage) {
+            modelToReplace.doPropertiesStage(modelOrigin);
+        }
         models.add(targetIndex, modelToReplace);
         models.remove(modelOrigin);
         notifyItemChanged(targetIndex);
@@ -282,6 +300,7 @@ public class CementAdapter extends RecyclerView.Adapter<CementViewHolder> {
     @Override
     public CementViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         CementViewHolder viewHolder = models.viewHolderFactory.create(viewType, parent);
+        viewHolder.supportPropertyStage = supportPropertyStage;
 
         eventHookHelper.bind(viewHolder);
         return viewHolder;
@@ -361,6 +380,12 @@ public class CementAdapter extends RecyclerView.Adapter<CementViewHolder> {
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         isAttached = true;
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        isAttached = false;
     }
 
     public void onSaveInstanceState(Bundle outState) {

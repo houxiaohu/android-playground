@@ -39,6 +39,8 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
 
     implementation project(':cement')
+    implementation project(':cement-annotations')
+    annotationProcessor project(':cement-processor')
 
     implementation "com.android.support:support-v4:$support_version"
     implementation "com.android.support:appcompat-v7:$support_version"
