@@ -9,9 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import info.xudshen.android.playground.R
-import info.xudshen.android.playground.recyclerview.adapter2.AbstractLoadMoreModel
-import info.xudshen.android.playground.recyclerview.adapter2.SimpleListAdapter
-import info.xudshen.android.playground.recyclerview.adapter2.UniversalAdapter
+import info.xudshen.android.playground.cement.*
 import kotlinx.android.synthetic.main.fragment_simple_list_adapter_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 
@@ -20,25 +18,24 @@ import kotlinx.android.synthetic.main.include_toolbar.*
  * *
  * @since 2017/2/9
  */
-
 class SimpleListAdapterSampleFragment : Fragment() {
-    var adapter = SimpleListAdapter()
+    var adapter = SimpleCementAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
-            = inflater?.inflate(R.layout.fragment_simple_list_adapter_sample, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+            inflater.inflate(R.layout.fragment_simple_list_adapter_sample, container, false)
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as AppCompatActivity?)?.setSupportActionBar(toolbar)
         (activity as AppCompatActivity?)?.title = "AbstractListAdapter"
 
-        adapter = SimpleListAdapter()
+        adapter = SimpleCementAdapter()
         list.layoutManager = LinearLayoutManager(context)
         list.adapter = adapter
 
@@ -49,27 +46,27 @@ class SimpleListAdapterSampleFragment : Fragment() {
         var dataCount = 0
 
         var hasMore = false
-        var loadMoreState = AbstractLoadMoreModel.COMPLETE
+        var loadMoreState = CementLoadMoreModel.COMPLETE
 
         add_header.setOnClickListener {
-            adapter.addHeader(UUniversalAdapterSampleFragment.TextModel(headerCount++))
+            adapter.addHeader(CementAdapterSampleFragment.TextModel(headerCount++))
         }
         add_footer.setOnClickListener {
-            adapter.addFooter(UUniversalAdapterSampleFragment.TextModel(footerCount++))
+            adapter.addFooter(CementAdapterSampleFragment.TextModel(footerCount++))
         }
         insert_data.setOnClickListener {
             adapter.addDataList((0..5).map {
-                UUniversalAdapterSampleFragment.TextModel(dataCount + it)
+                CementAdapterSampleFragment.TextModel(dataCount + it)
             }, hasMore)
             adapter.setLoadMoreState(loadMoreState)
             dataCount += 6
         }
         insert_data_1.setOnClickListener {
-            adapter.addData(UUniversalAdapterSampleFragment.TextModel(dataCount++))
+            adapter.addData(CementAdapterSampleFragment.TextModel(dataCount++))
         }
         reload_data.setOnClickListener {
             adapter.updateDataList((0..3).map {
-                UUniversalAdapterSampleFragment.TextModel(dataCount + it)
+                CementAdapterSampleFragment.TextModel(dataCount + it)
             }, hasMore)
             adapter.setLoadMoreState(loadMoreState)
             dataCount += 4
@@ -112,21 +109,21 @@ class SimpleListAdapterSampleFragment : Fragment() {
                 adapter.setHasMore(hasMore)
             } else if (view == load_start) {
                 if (hasMore) {
-                    loadMoreState = AbstractLoadMoreModel.START
+                    loadMoreState = CementLoadMoreModel.START
                     load_start.isChecked = true
                     load_complete.isChecked = false
                     load_failed.isChecked = false
                 }
             } else if (view == load_complete) {
                 if (hasMore) {
-                    loadMoreState = AbstractLoadMoreModel.COMPLETE
+                    loadMoreState = CementLoadMoreModel.COMPLETE
                     load_start.isChecked = false
                     load_complete.isChecked = true
                     load_failed.isChecked = false
                 }
             } else if (view == load_failed) {
                 if (hasMore) {
-                    loadMoreState = AbstractLoadMoreModel.FAILED
+                    loadMoreState = CementLoadMoreModel.FAILED
                     load_start.isChecked = false
                     load_complete.isChecked = false
                     load_failed.isChecked = true
@@ -140,12 +137,12 @@ class SimpleListAdapterSampleFragment : Fragment() {
         load_failed.setOnClickListener { checkLoadMoreState(it) }
     }
 
-    class EmptyViewModel : UniversalAdapter.AbstractModel<EmptyViewModel.ViewHolder>() {
+    class EmptyViewModel : CementModel<EmptyViewModel.ViewHolder>() {
         override fun getLayoutRes(): Int = R.layout.layout_empty_view_item
 
-        override fun getViewHolderCreator(): UniversalAdapter.IViewHolderCreator<ViewHolder> =
-                UniversalAdapter.IViewHolderCreator { ViewHolder(it) }
+        override fun getViewHolderCreator(): CementAdapter.IViewHolderCreator<ViewHolder> =
+                CementAdapter.IViewHolderCreator { ViewHolder(it) }
 
-        class ViewHolder(itemView: View) : UniversalAdapter.ViewHolder(itemView)
+        class ViewHolder(itemView: View) : CementViewHolder(itemView)
     }
 }

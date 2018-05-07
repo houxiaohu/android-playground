@@ -12,7 +12,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer
 import info.xudshen.android.playground.R
-import info.xudshen.android.playground.data.SampleItemDataSource
+import info.xudshen.android.playground.samples.SampleItemDataSource
 import kotlinx.android.synthetic.main.fragment_uil_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.layout_uil_sample_item.view.*
@@ -26,10 +26,10 @@ class UILSampleFragment : Fragment() {
         DisplayImageOptions.Builder().displayer(FadeInBitmapDisplayer(3000)).build()
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
-            = inflater?.inflate(R.layout.fragment_uil_sample, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+            inflater.inflate(R.layout.fragment_uil_sample, container, false)
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity?)?.setSupportActionBar(toolbar)
         (activity as AppCompatActivity?)?.title = "UIL Sample"
@@ -38,16 +38,12 @@ class UILSampleFragment : Fragment() {
         uil_list.adapter = UILSampleItemAdapter()
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     inner class UILSampleItemAdapter : RecyclerView.Adapter<UILSampleItemAdapter.ViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder
-                = ViewHolder(LayoutInflater.from(parent?.context).inflate(viewType, parent, false))
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+                ViewHolder(LayoutInflater.from(parent.context).inflate(viewType, parent, false))
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.itemView.uil_iv.loadImage {
+            holder.itemView.uil_iv.loadImage { _, _ ->
                 ImageLoader.getInstance().displayImage(SampleItemDataSource.IMAGE_DATA.elementAtOrNull(position),
                         holder.itemView.uil_iv, options)
             }

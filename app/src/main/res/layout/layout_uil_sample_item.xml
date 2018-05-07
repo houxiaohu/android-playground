@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <info.xudshen.android.playground.view.widget.SmartImageView
+    <info.xudshen.android.playground.widget.SmartImageView
         android:id="@+id/uil_iv"
         android:layout_width="match_parent"
         android:layout_height="120dp"

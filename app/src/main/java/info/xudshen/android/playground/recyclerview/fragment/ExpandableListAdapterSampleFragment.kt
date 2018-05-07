@@ -8,8 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import info.xudshen.android.playground.R
-import info.xudshen.android.playground.recyclerview.adapter2.ExpandableList
-import info.xudshen.android.playground.recyclerview.adapter2.ExpandableListAdapter
+import info.xudshen.android.playground.cement.ExpandableCementAdapter
+import info.xudshen.android.playground.cement.ExpandableList
 import kotlinx.android.synthetic.main.fragment_simple_list_adapter_sample.*
 import java.util.*
 
@@ -17,18 +17,18 @@ import java.util.*
  * Created by Shen on 2017/2/12.
  */
 class ExpandableListAdapterSampleFragment : Fragment() {
-    var adapter = ExpandableListAdapter()
+    var adapter = ExpandableCementAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
-            = inflater?.inflate(R.layout.fragment_simple_list_adapter_sample, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+            inflater.inflate(R.layout.fragment_simple_list_adapter_sample, container, false)
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = ExpandableListAdapter()
+        adapter = ExpandableCementAdapter()
         list.layoutManager = LinearLayoutManager(context)
         list.adapter = adapter
 
@@ -36,9 +36,9 @@ class ExpandableListAdapterSampleFragment : Fragment() {
         val random = Random()
         insert_data.setOnClickListener {
             val gid = random.nextInt(10) * 10000
-            val data = ExpandableList(UUniversalAdapterSampleFragment.TextModel(gid))
+            val data = ExpandableList(CementAdapterSampleFragment.TextModel(gid))
             (1..random.nextInt(5)).map {
-                data.childModels.add(UUniversalAdapterSampleFragment.TextModel(gid + it))
+                data.childModels.add(CementAdapterSampleFragment.TextModel(gid + it))
             }
             adapter.addData(data)
         }
@@ -52,7 +52,7 @@ class ExpandableListAdapterSampleFragment : Fragment() {
                     val randomStart = random.nextInt(10)
                     val randomEnd = randomStart + random.nextInt(5)
                     (randomStart..randomEnd).map {
-                        data.childModels.add(UUniversalAdapterSampleFragment.TextModel(gid.toInt() + it))
+                        data.childModels.add(CementAdapterSampleFragment.TextModel(gid.toInt() + it))
                     }
                 }
                 adapter.notifyDataChanged(data)

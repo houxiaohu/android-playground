@@ -54,8 +54,8 @@ public class GridPaddingItemDecoration extends RecyclerView.ItemDecoration {
                 spanCount = gridLayoutManager.getSpanCount();
                 spanSizeLookup = gridLayoutManager.getSpanSizeLookup();
 
-                calculatedItemTotalPadding = (int) ((spanHeaderPadding + spanFooterPadding + (spanCount - 1) * spanItemPadding)
-                        * 1.0f / spanCount);
+                calculatedItemTotalPadding = (int) ((spanHeaderPadding + spanFooterPadding
+                        + (spanCount - 1) * spanItemPadding) * 1.0f / spanCount);
             }
         }
         return spanSizeLookup != null;

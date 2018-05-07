@@ -22,40 +22,41 @@ import kotlinx.android.synthetic.main.layout_simple_item.view.*
  */
 
 class ItemDecorationSampleFragment : Fragment() {
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
-            = inflater?.inflate(R.layout.fragment_item_decoration_sample, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+            inflater.inflate(R.layout.fragment_item_decoration_sample, container, false)
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         item_padding_lm_horizontal.isNestedScrollingEnabled = false
         item_padding_lm_horizontal.layoutManager = LinearLayoutManager(context, OrientationHelper.HORIZONTAL, false)
         item_padding_lm_horizontal.addItemDecoration(LinearPaddingItemDecoration(
-                context.dp2px(5), context.dp2px(5), context.dp2px(15)))
+                context!!.dp2px(5), context!!.dp2px(5), context!!.dp2px(15)))
         item_padding_lm_horizontal.adapter = SimpleItemAdapter(count = 10, autoWidth = false)
 
         item_padding_lm_vertical.isNestedScrollingEnabled = false
         item_padding_lm_vertical.layoutManager = LinearLayoutManager(context, OrientationHelper.VERTICAL, false)
         item_padding_lm_vertical.addItemDecoration(LinearPaddingItemDecoration(
-                context.dp2px(2), context.dp2px(2), context.dp2px(4)))
+                context!!.dp2px(2), context!!.dp2px(2), context!!.dp2px(4)))
         item_padding_lm_vertical.adapter = SimpleItemAdapter(count = 4, autoWidth = false)
 
         item_padding_gm_horizontal.isNestedScrollingEnabled = false
         item_padding_gm_horizontal.layoutManager = GridLayoutManager(context, 5, OrientationHelper.HORIZONTAL, false)
         item_padding_gm_horizontal.addItemDecoration(GridPaddingItemDecoration(
-                context.dp2px(2), context.dp2px(2), context.dp2px(4)))
+                context!!.dp2px(2), context!!.dp2px(2), context!!.dp2px(4)))
         item_padding_gm_horizontal.adapter = SimpleItemAdapter(count = 40, autoWidth = false)
 
         item_padding_gm_vertical.isNestedScrollingEnabled = false
         item_padding_gm_vertical.layoutManager = GridLayoutManager(context, 3, OrientationHelper.VERTICAL, false)
         item_padding_gm_vertical.addItemDecoration(GridPaddingItemDecoration(
-                context.dp2px(5), context.dp2px(5), context.dp2px(15)))
+                context!!.dp2px(5), context!!.dp2px(5), context!!.dp2px(15)))
         item_padding_gm_vertical.adapter = SimpleItemAdapter(count = 15)
     }
 
-    class SimpleItemAdapter(val count: Int, val autoWidth: Boolean = true) : RecyclerView.Adapter<SimpleItemAdapter.SimpleItemViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): SimpleItemViewHolder
-                = SimpleItemViewHolder(LayoutInflater.from(parent?.context).inflate(viewType, parent, false))
+    class SimpleItemAdapter(val count: Int, val autoWidth: Boolean = true)
+        : RecyclerView.Adapter<SimpleItemAdapter.SimpleItemViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleItemViewHolder =
+                SimpleItemViewHolder(LayoutInflater.from(parent.context).inflate(viewType, parent, false))
 
         override fun onBindViewHolder(holder: SimpleItemViewHolder, position: Int) {
             holder.itemView.section_title.text = position.toString()

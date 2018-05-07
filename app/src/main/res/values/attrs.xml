@@ -1,0 +1,9 @@
+<resources>
+    <declare-styleable name="FixAspectRatioRelativeLayout">
+        <attr name="aspectRatio" format="float" />
+    </declare-styleable>
+
+    <declare-styleable name="SmartImageView">
+        <attr name="fadeInDuration" format="integer" />
+    </declare-styleable>
+</resources>

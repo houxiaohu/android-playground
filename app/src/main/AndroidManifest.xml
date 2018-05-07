@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".view.activity.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
@@ -23,6 +23,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".view.activity.SampleActivity" />
+        <activity android:name=".samples.SampleItemActivity" />
     </application>
 </manifest>
