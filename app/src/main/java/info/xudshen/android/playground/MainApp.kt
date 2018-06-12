@@ -12,9 +12,10 @@ class MainApp : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
 
-        val config = ImageLoaderConfiguration.Builder(this)
+        val config = ImageLoaderConfiguration.Builder(applicationContext)
                 .writeDebugLogs()
                 .build()
         ImageLoader.getInstance().init(config)
+        System.setProperty("kotlinx.coroutines.debug", "on")
     }
 }
