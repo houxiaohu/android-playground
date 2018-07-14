@@ -23,6 +23,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".samples.SampleItemActivity" />
+        <activity android:name=".SampleContainerActivity" />
     </application>
 </manifest>

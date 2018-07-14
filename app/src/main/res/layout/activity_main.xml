@@ -22,7 +22,7 @@
             <ImageView
                 android:id="@+id/expandedImage"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="120dp"
                 android:background="@color/colorPrimary"
                 app:layout_collapseMode="parallax"
                 app:layout_scrollFlags="scroll" />

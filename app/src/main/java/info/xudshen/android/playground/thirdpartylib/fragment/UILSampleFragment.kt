@@ -1,4 +1,4 @@
-package info.xudshen.android.playground.imageloader.fragment
+package info.xudshen.android.playground.thirdpartylib.fragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -12,7 +12,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer
 import info.xudshen.android.playground.R
-import info.xudshen.android.playground.samples.SampleItemDataSource
+import info.xudshen.android.playground.SampleDataSource
 import kotlinx.android.synthetic.main.fragment_uil_sample.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.layout_uil_sample_item.view.*
@@ -44,12 +44,12 @@ class UILSampleFragment : Fragment() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.itemView.uil_iv.loadImage { _, _ ->
-                ImageLoader.getInstance().displayImage(SampleItemDataSource.IMAGE_DATA.elementAtOrNull(position),
+                ImageLoader.getInstance().displayImage(SampleDataSource.IMAGE_DATA.elementAtOrNull(position),
                         holder.itemView.uil_iv, options)
             }
         }
 
-        override fun getItemCount(): Int = SampleItemDataSource.IMAGE_DATA.size
+        override fun getItemCount(): Int = SampleDataSource.IMAGE_DATA.size
 
         override fun getItemViewType(position: Int): Int = R.layout.layout_uil_sample_item
 
