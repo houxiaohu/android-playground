@@ -1,7 +1,8 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
+    buildToolsVersion '28.0.2'
 
     compileOptions {
         sourceCompatibility 1.7
@@ -9,8 +10,8 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 20
-        targetSdkVersion 27
+        minSdkVersion 24
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
